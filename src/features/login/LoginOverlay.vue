@@ -80,17 +80,16 @@ channel.onmessage = (e) => {
 
 const dialogRef = ref<HTMLDialogElement>();
 
-const currentUserState =
-  window.authenticationProvider === "gateway"
-    ? useCurrentUserFromGateway()
-    : useCurrentUser();
+const currentUserState = useCurrentUser();
 
 const userStore = useUserStore();
 
 const initialized = ref(false);
 
 const isLoggedInRef = computed(
-  () => currentUserState.success && currentUserState.data.isLoggedIn
+  () =>
+    (currentUserState.success && currentUserState.data.isLoggedIn) ||
+    window.sessionStorage.getItem("user")
 );
 
 const isLoadingRef = computed(() => currentUserState.loading);
@@ -122,6 +121,11 @@ function onLogin() {
 
 function onLogout(e: Event) {
   e.preventDefault();
+
+  if (window.authenticationProvider === "gateway") {
+    window.sessionStorage.removeItem("user");
+  }
+
   return logOut()
     .then(() => {
       channel.postMessage(messageTypes.refresh);

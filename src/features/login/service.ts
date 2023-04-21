@@ -7,6 +7,19 @@ const anonymousUser = Object.freeze({
 });
 
 async function fetchUser(url: string): Promise<User> {
+  const user = window.sessionStorage.getItem("user");
+
+  if (user) {
+    const jsonUser = JSON.parse(user);
+
+    return {
+      isLoggedIn: true,
+      roles: [],
+      id: jsonUser.id,
+      email: jsonUser.email,
+    };
+  }
+
   const response = await fetch(url, {
     credentials: "include",
   });
