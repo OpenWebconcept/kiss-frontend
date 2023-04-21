@@ -48,24 +48,6 @@ async function fetchUser(url: string): Promise<User> {
 
 export const useCurrentUser = () => ServiceResult.fromFetcher(meUrl, fetchUser);
 
-async function fetchUserFromGateway(): Promise<User> {
-  if (!window.sessionStorage.getItem("user")) {
-    return anonymousUser;
-  }
-
-  const user = JSON.parse(window.sessionStorage.getItem("user") ?? "");
-
-  return {
-    isLoggedIn: true,
-    roles: [],
-    id: user.id,
-    email: user.email,
-  };
-}
-
-export const useCurrentUserFromGateway = () =>
-  ServiceResult.fromFetcher("", fetchUserFromGateway);
-
 export const logOut = () =>
   fetch(logoutUrl, { credentials: "include" }).then((r) => {
     if (!r.ok) throw new Error("Logout failed");
