@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { watch, computed, ref } from "vue";
-import { logOut, useCurrentUser, useCurrentUserFromGateway } from "./service";
+import { logOut, useCurrentUser } from "./service";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import { handleLogin } from "@/services";
 import { loginUrl, redirectUrl, sessionStorageKey } from "./config";
