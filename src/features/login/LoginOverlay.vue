@@ -18,12 +18,13 @@
 
 <script lang="ts" setup>
 import { watch, computed, ref } from "vue";
-import { logOut, useCurrentUser } from "./service";
+import { logOut, useCurrentUser, useCurrentUserFromGateway } from "./service";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import { handleLogin } from "@/services";
 import { loginUrl, redirectUrl, sessionStorageKey } from "./config";
 import { useUserStore, type User } from "@/stores/user";
 import { toast } from "@/stores/toast";
+import router from "@/router";
 
 let newTab: Window | null = null;
 
@@ -79,7 +80,11 @@ channel.onmessage = (e) => {
 
 const dialogRef = ref<HTMLDialogElement>();
 
-const currentUserState = useCurrentUser();
+const currentUserState =
+  window.authenticationProvider === "gateway"
+    ? useCurrentUserFromGateway()
+    : useCurrentUser();
+
 const userStore = useUserStore();
 
 const initialized = ref(false);
@@ -141,6 +146,10 @@ function redirectToLogin() {
   window.location.href = loginUrl;
 }
 
+function redirectToGatewayLogin() {
+  router.push("/login");
+}
+
 // in case of a session expiry, you have a minute to log in again.
 // after that, we refresh the page.
 // otherwise, an unauthorized person might be able to see sensitive data by inspecting the HTML with DevTools.
@@ -169,7 +178,8 @@ watch(
     if (!isInitialized) {
       // this is the first time you open this window.
       // we can immediately redirect to login.
-      redirectToLogin();
+      window.authenticationProvider === "dex" && redirectToLogin();
+      window.authenticationProvider === "gateway" && redirectToGatewayLogin();
       return;
     }
 
