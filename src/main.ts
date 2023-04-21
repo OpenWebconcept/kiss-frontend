@@ -6,6 +6,7 @@ import { useIntersectionObserver } from "@vueuse/core";
 
 declare global {
   interface Window {
+    authenticationProvider: "gateway" | "dex";
     organisatieIds: string[];
     pubBeheerUrl: string;
     gatewayBaseUri: string;
