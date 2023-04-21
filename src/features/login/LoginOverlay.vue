@@ -86,11 +86,12 @@ const userStore = useUserStore();
 
 const initialized = ref(false);
 
-const isLoggedInRef = computed(
-  () =>
-    (currentUserState.success && currentUserState.data.isLoggedIn) ||
-    window.sessionStorage.getItem("user")
-);
+const isLoggedInRef = computed(() => {
+  const user = window.sessionStorage.getItem("user");
+  return (
+    !!user || (currentUserState.success && currentUserState.data.isLoggedIn)
+  );
+});
 
 const isLoadingRef = computed(() => currentUserState.loading);
 
