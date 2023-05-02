@@ -54,7 +54,7 @@ export function parseGeboortedatumAchternaam(
 
   if (!geboortedatumAchternaamRegex.test(input)) {
     return new Error(
-      "Voor een valide datum en achternaam in, bijvoorbeeld 17-09-1995 Leeuwen. Voer GEEN tussenvoegsel in."
+      "Voer een valide geboortedatum en achternaam in, bijvoorbeeld 17-09-1995 Leeuwen. Voer GEEN tussenvoegsel(s) in."
     );
   }
 
