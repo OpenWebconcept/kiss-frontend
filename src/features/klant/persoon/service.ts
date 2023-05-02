@@ -114,8 +114,6 @@ function getPersoonSearchUrl<K extends PersoonSearchField>(
 
   const url = new URL(personenRootUrl);
 
-  console.log({ search });
-
   getQueryParams<K>(search).forEach((tuple) => {
     url.searchParams.set(...tuple);
   });
