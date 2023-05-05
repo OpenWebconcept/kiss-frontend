@@ -24,6 +24,9 @@ import { handleLogin } from "@/services";
 import { loginUrl, redirectUrl, sessionStorageKey } from "./config";
 import { useUserStore, type User } from "@/stores/user";
 import { toast } from "@/stores/toast";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 let newTab: Window | null = null;
 
@@ -138,7 +141,9 @@ function onLinkClick(e: Event) {
 }
 
 function redirectToLogin() {
-  window.location.href = loginUrl;
+  if (router.currentRoute.value.path !== "/login") {
+    window.location.href = loginUrl;
+  }
 }
 
 // in case of a session expiry, you have a minute to log in again.
