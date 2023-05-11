@@ -23,6 +23,7 @@
 </template>
 
 <script lang="ts" setup>
+import Cookies from "js-cookie";
 import { ref } from "vue";
 import {
   Heading as UtrechtHeading,
@@ -49,6 +50,8 @@ async function handleSubmit() {
   if (response.ok) {
     const data = await response.json();
     window.sessionStorage.setItem("user", data);
+
+    Cookies.set("jwt", data.jwtToken);
 
     router.push("/");
   }

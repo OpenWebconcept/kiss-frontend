@@ -1,3 +1,5 @@
+import Cookies from "js-cookie";
+
 type FetchArgs = Parameters<typeof fetch>;
 type FetchReturn = ReturnType<typeof fetch>;
 
@@ -32,6 +34,16 @@ export function fetchLoggedIn(...args: FetchArgs): FetchReturn {
     init.credentials = "include";
     args[1] = init;
   }
+
+  const options = args[1];
+
+  args[1] = {
+    ...options,
+    headers: {
+      ...options?.headers,
+      Authorization: `Bearer ${Cookies.get("jwt")}`,
+    },
+  };
 
   return fetch(...args).then((r) => {
     if (r.status === 401) {
