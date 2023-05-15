@@ -24,6 +24,7 @@ export interface Contactmoment {
   primaireVraag?: string;
   primaireVraagWeergave?: string;
   afwijkendOnderwerp?: string;
+  afdeling?: string;
 }
 
 export interface Gespreksresultaat {
