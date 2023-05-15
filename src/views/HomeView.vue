@@ -136,6 +136,9 @@ import { parseValidInt } from "@/services";
 import MultiSelect from "@/components/MultiSelect.vue";
 import { useUserStore } from "@/stores/user";
 import { ensureState } from "@/stores/create-store";
+import { useCurrentUser } from "@/features/login/service";
+
+useCurrentUser(); // init current user after login
 
 const { pubBeheerUrl } = window;
 
