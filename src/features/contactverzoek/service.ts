@@ -19,6 +19,7 @@ export interface Contactverzoek {
   };
   primaireVraagWeergave?: string;
   afwijkendOnderwerp?: string;
+  afdeling?: string;
 }
 
 export function saveContactverzoek(data: Contactverzoek) {

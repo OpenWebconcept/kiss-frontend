@@ -47,6 +47,7 @@ export interface Vraag {
   werkinstructies: { werkinstructie: Werkinstructie; shouldStore: boolean }[];
   primaireVraag: { url: string; title: string } | undefined;
   afwijkendOnderwerp: string;
+  afdeling?: string;
 }
 
 function initVraag(): Vraag {
