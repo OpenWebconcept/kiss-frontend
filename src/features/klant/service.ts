@@ -171,8 +171,6 @@ function updateContactgegevens({
 
     delete _klant.embedded;
 
-    // remove _self from telefoonnummers and emails
-
     return JSON.stringify({ ...klant, telefoonnummers, emails });
   };
 
