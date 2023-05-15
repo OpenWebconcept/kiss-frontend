@@ -165,6 +165,15 @@ function updateContactgegevens({
   emails,
 }: UpdateContactgegevensParams): Promise<UpdateContactgegevensParams> {
   const url = klantRootUrl + "/" + id;
+
+  const mapKlantPayload = (klant: any) => {
+    const _klant = klant;
+
+    delete _klant.embedded;
+
+    return JSON.stringify({ ...klant, telefoonnummers, emails });
+  };
+
   return fetchLoggedIn(url + "?fields[]=klantnummer&fields[]=bronorganisatie")
     .then(throwIfNotOk)
     .then(parseJson)
@@ -174,13 +183,7 @@ function updateContactgegevens({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...klant,
-          embedded: {
-            telefoonnummers,
-            emails,
-          },
-        }),
+        body: mapKlantPayload(klant),
       })
     )
     .then(throwIfNotOk)
