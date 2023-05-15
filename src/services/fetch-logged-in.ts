@@ -1,4 +1,6 @@
 import Cookies from "js-cookie";
+import jwtDecode from "jwt-decode";
+import type { JwtPayload } from "jwt-decode";
 
 type FetchArgs = Parameters<typeof fetch>;
 type FetchReturn = ReturnType<typeof fetch>;
@@ -28,6 +30,8 @@ export function handleLogin() {
 }
 
 export function fetchLoggedIn(...args: FetchArgs): FetchReturn {
+  if (!validateSession()) Cookies.remove("jwt");
+
   const init = args[1] || {};
 
   if (!init.credentials) {
@@ -55,3 +59,15 @@ export function fetchLoggedIn(...args: FetchArgs): FetchReturn {
     return r;
   });
 }
+
+const validateSession = () => {
+  const token = Cookies.get("jwt");
+
+  if (!token) return false;
+
+  const decoded = jwtDecode<JwtPayload>(token);
+
+  const expired = decoded?.exp && Date.now() >= decoded.exp * 1000;
+
+  return !expired;
+};
