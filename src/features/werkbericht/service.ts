@@ -98,10 +98,12 @@ function parseWerkbericht(
  * Fetches a lookuplist from the api
  * @param url
  */
-function fetchLookupList(urlStr: string): Promise<LookupList<number, string>> {
+function fetchLookupList(
+  urlStr: string,
+  filterSlugs?: string[]
+): Promise<LookupList<number, string>> {
   const url = new URL(urlStr);
 
-  // having pagination here is a nuisance.
   if (!url.searchParams.has("page")) {
     url.searchParams.set("per_page", WP_MAX_ALLOWED_PAGE_SIZE);
   }
@@ -109,14 +111,25 @@ function fetchLookupList(urlStr: string): Promise<LookupList<number, string>> {
   return fetchLoggedIn(url)
     .then((r) => r.json())
     .then((json) => {
-      if (!Array.isArray(json))
+      if (!Array.isArray(json)) {
         throw new Error(
-          "Invalide json, verwacht een lijst: " + JSON.stringify(json)
+          "Invalid json, expected an array: " + JSON.stringify(json)
         );
-      return json
-        .filter((x) => typeof x?.id === "number" && typeof x?.slug === "string")
-        .filter((x) => x.slug === "werkinstructie" || x.slug === "nieuws") // we never want to return any other slug
-        .map((x) => [x.id, x.slug] as [number, string]);
+      }
+
+      const filteredJson = json.filter(
+        (x) => typeof x?.id === "number" && typeof x?.slug === "string"
+      );
+
+      let filteredResult = filteredJson;
+
+      if (filterSlugs && filterSlugs.length > 0) {
+        filteredResult = filteredJson.filter((x) =>
+          filterSlugs.includes(x.slug)
+        );
+      }
+
+      return filteredResult.map((x) => [x.id, x.slug] as [number, string]);
     })
     .then(createLookupList);
 }
@@ -126,7 +139,9 @@ function fetchLookupList(urlStr: string): Promise<LookupList<number, string>> {
  */
 export function useBerichtTypes(): ServiceData<LookupList<number, string>> {
   const url = window.gatewayBaseUri + "/api/openpub/openpub_type";
-  return ServiceResult.fromFetcher(url, fetchLookupList);
+  return ServiceResult.fromFetcher(url, () =>
+    fetchLookupList(url, ["werkinstructie", "nieuws"])
+  );
 }
 
 /**
