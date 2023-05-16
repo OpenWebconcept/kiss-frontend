@@ -99,6 +99,7 @@ export function useContactverzoekenByKlantId(
     url.searchParams.append("extend[]", "medewerker");
     url.searchParams.append("extend[]", "embedded._self.owner");
     url.searchParams.append("extend[]", "embedded.contactmoment.todo");
+    url.searchParams.append("extend[]", "embedded.contactmoment.afdeling");
     url.searchParams.set("_limit", "10");
     url.searchParams.set("_page", page.value.toString());
     url.searchParams.set("embedded.klant._self.id", id.value);
@@ -142,5 +143,6 @@ const mapContactverzoekDetail = (
     notitie: todo.description,
     primaireVraagWeergave: contactmoment.primaireVraagWeergave,
     afwijkendOnderwerp: contactmoment.afwijkendOnderwerp,
+    afdeling: contactmoment.embedded?.afdeling?.name,
   };
 };

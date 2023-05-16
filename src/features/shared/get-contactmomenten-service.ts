@@ -51,6 +51,7 @@ const mapContactmoment = async (
 
   contactmoment.startdatum = new Date(contactmoment.startdatum);
   contactmoment.registratiedatum = new Date(contactmoment.registratiedatum);
+  contactmoment.afdeling = r.embedded.contactmoment?.embedded?.afdeling?.name;
 
   const objectcontactmomenten: any[] =
     r.embedded?.contactmoment?.embedded?.objectcontactmomenten ?? [];

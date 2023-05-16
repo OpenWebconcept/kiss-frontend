@@ -63,6 +63,16 @@
             {{ contactverzoek.notitie }}
           </dd>
         </dl>
+
+        <dl>
+          <dt>Afdeling</dt>
+          <dd>
+            <span v-if="contactverzoek.afdeling">{{
+              contactverzoek.afdeling
+            }}</span>
+            <span v-else>Geen afdeling</span>
+          </dd>
+        </dl>
       </div>
     </div>
   </section>

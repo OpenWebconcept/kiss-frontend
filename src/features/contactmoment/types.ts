@@ -49,4 +49,5 @@ export interface ContactverzoekDetail {
   notitie: string;
   primaireVraagWeergave?: string;
   afwijkendOnderwerp?: string;
+  afdeling?: string;
 }
