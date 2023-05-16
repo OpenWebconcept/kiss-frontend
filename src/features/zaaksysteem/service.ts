@@ -58,7 +58,7 @@ const mapZaakDetails = (zaak: any) => {
     zaaktype: zaak.embedded.zaaktype.id,
     zaaktypeLabel: zaak.embedded.zaaktype.onderwerp,
     zaaktypeOmschrijving: zaak.embedded.zaaktype.omschrijving,
-    status: zaak.embedded.status.statustoelichting,
+    status: zaak.embedded?.status?.statustoelichting ?? "Onbekend",
     behandelaar: getNamePerRoltype(zaak, "behandelaar"),
     aanvrager: getNamePerRoltype(zaak, "initiator"),
     startdatum,
