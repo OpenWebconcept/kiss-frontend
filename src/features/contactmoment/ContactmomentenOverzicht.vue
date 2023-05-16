@@ -17,7 +17,7 @@
                 formatDateOnly(contactmoment.registratiedatum)
               }}</span>
               <span aria-describedby="medewerker-header">{{
-                contactmoment["_self"].owner
+                contactmoment["_self"].owner.name
               }}</span>
               <span aria-describedby="kanaal-header">{{
                 contactmoment.kanaal
