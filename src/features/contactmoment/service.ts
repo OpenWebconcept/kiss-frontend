@@ -138,7 +138,7 @@ const mapContactverzoekDetail = (
     behandelaar: todo.attendees?.[0] ?? "-",
     afgerond: todo.completed ? formatDateOnly(new Date(todo.completed)) : "-",
     starttijd: formatTimeOnly(new Date(contactmoment.registratiedatum)),
-    aanmaker: contactmoment["_self"].owner,
+    aanmaker: contactmoment["_self"].owner.name,
     notitie: todo.description,
     primaireVraagWeergave: contactmoment.primaireVraagWeergave,
     afwijkendOnderwerp: contactmoment.afwijkendOnderwerp,

@@ -10,7 +10,7 @@ export interface ContactmomentViewModel {
   zaken: ContactmomentZaak[];
   contactverzoeken: ContactmomentContactverzoek[];
   _self: {
-    owner: string;
+    owner: { name: string };
   };
   primaireVraag?: string;
   primaireVraagWeergave?: string;
