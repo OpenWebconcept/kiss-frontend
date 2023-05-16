@@ -388,7 +388,7 @@
 
             <div v-if="afdelingen.success && afdelingen.data.length">
               <select
-                v-model="vraag.afdeling"
+                v-model="vraag.contactverzoek.afdeling"
                 class="utrecht-select utrecht-select--html-select"
                 :id="'verzoek-afdeling' + idx"
               >
@@ -537,7 +537,7 @@ const saveVraag = async (vraag: Vraag, gespreksId?: string) => {
     primaireVraag: vraag.primaireVraag?.url,
     primaireVraagWeergave: vraag.primaireVraag?.title,
     afwijkendOnderwerp: vraag.afwijkendOnderwerp || undefined,
-    afdeling: vraag.afdeling,
+    afdeling: vraag.contactverzoek.afdeling,
   };
 
   addKennisartikelenToContactmoment(contactmoment, vraag);
