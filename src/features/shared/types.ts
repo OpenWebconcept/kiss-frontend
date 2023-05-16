@@ -15,6 +15,7 @@ export interface ContactmomentViewModel {
   primaireVraag?: string;
   primaireVraagWeergave?: string;
   afwijkendOnderwerp?: string;
+  afdeling?: string;
 }
 
 export interface ContactmomentZaak {
