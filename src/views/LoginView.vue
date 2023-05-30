@@ -21,6 +21,7 @@
 
       <utrecht-button
         type="submit"
+        appearance="primary-action-button"
         :disabled="!username || !password || isLoading"
         >Login</utrecht-button
       >
