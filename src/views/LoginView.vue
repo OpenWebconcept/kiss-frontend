@@ -2,7 +2,7 @@
   <div class="template">
     <utrecht-heading :level="1">Login</utrecht-heading>
 
-    <form @submit.prevent="handleSubmit">
+    <form @submit.prevent="handleSubmit" class="form">
       <input
         type="text"
         v-model="username"
@@ -15,7 +15,13 @@
         class="utrecht-textbox utrecht-textbox--html-input"
       />
 
-      <utrecht-button type="submit" :disabled="!username || !password"
+      <span class="error" v-if="errorMessage"
+        >Oops something went wrong: {{ errorMessage }}</span
+      >
+
+      <utrecht-button
+        type="submit"
+        :disabled="!username || !password || isLoading"
         >Login</utrecht-button
       >
     </form>
@@ -33,8 +39,13 @@ import router from "@/router";
 
 const username = ref("");
 const password = ref("");
+const isLoading = ref(false);
+const errorMessage = ref("");
 
 async function handleSubmit() {
+  isLoading.value = true;
+  errorMessage.value = "";
+
   const url = `${window.gatewayBaseUri}/api/users/login`;
   const payload = { username: username.value, password: password.value };
   const options = {
@@ -46,6 +57,13 @@ async function handleSubmit() {
   };
 
   const response = await fetch(url, options);
+
+  isLoading.value = false;
+
+  if (!response.ok) {
+    const data = await response.json();
+    errorMessage.value = data.message;
+  }
 
   if (response.ok) {
     const data = await response.json();
@@ -61,6 +79,23 @@ async function handleSubmit() {
 <style lang="scss" scoped>
 .template {
   max-width: 100vw;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+
+  button {
+    width: fit-content;
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  .error {
+    color: var(--color-error);
+  }
 }
 
 * {
