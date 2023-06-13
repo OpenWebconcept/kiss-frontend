@@ -130,3 +130,28 @@ export function useContactmomentenByKlantId(
     },
   });
 }
+
+export function useContactmomentenByUserId(id: Ref<string>, page: Ref<number>) {
+  function getUrl() {
+    const url = new URL(window.gatewayBaseUri + "/api/klantcontactmomenten");
+
+    url.searchParams.set(
+      "_order[embedded.contactmoment.registratiedatum]",
+      "desc"
+    );
+    url.searchParams.append("extend[]", "medewerker");
+    url.searchParams.append("extend[]", "embedded._self.owner");
+    url.searchParams.append("extend[]", "embedded.contactmoment.todo");
+    url.searchParams.set("_limit", "10");
+    url.searchParams.set("_page", page.value.toString());
+    url.searchParams.set("_self.owner.id", id.value);
+    url.searchParams.set("embedded.contactmoment.todo", "IS NULL");
+
+    return url.toString();
+  }
+  return ServiceResult.fromFetcher(getUrl, fetchContactmomenten, {
+    getUniqueId() {
+      return getUrl() + "contactmoment";
+    },
+  });
+}

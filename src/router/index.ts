@@ -14,6 +14,7 @@ import { redirectRoute } from "@/features/login";
 import BedrijvenView from "@/views/BedrijvenView.vue";
 import BedrijfDetailView from "@/views/BedrijfDetailView.vue";
 import LinksView from "@/views/LinksView.vue";
+import ContactmomentenHistorieView from "@/views/ContactmomentenHistorieView.vue";
 import LoginView from "@/views/LoginView.vue";
 
 const guardContactMoment: NavigationGuard = (to, from, next) => {
@@ -102,6 +103,12 @@ const router = createRouter({
       name: "login",
       component: LoginView,
       meta: { showNav: false, showNotice: false, showSearch: false },
+    },
+    {
+      path: "/contactmomenten-historie",
+      name: "contactmomenten-historie",
+      component: ContactmomentenHistorieView,
+      meta: { showNav: true, showNotice: true, showSearch: true },
     },
     redirectRoute,
   ],

@@ -497,10 +497,13 @@ const zakenToevoegenAanContactmoment = async (
 };
 
 const koppelKlanten = async (vraag: Vraag, contactmomentId: string) => {
-  for (const { shouldStore, klant } of vraag.klanten) {
-    if (shouldStore) {
-      await koppelKlant({ contactmomentId, klantId: klant.id });
-    }
+  if (!vraag.klanten.length) {
+    await koppelKlant({ contactmomentId, klantId: "" });
+
+    return;
+  }
+  for (const { klant } of vraag.klanten) {
+    await koppelKlant({ contactmomentId, klantId: klant.id });
   }
 };
 

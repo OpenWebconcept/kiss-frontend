@@ -68,8 +68,8 @@ async function handleSubmit() {
 
   if (response.ok) {
     const data = await response.json();
-    window.sessionStorage.setItem("user", data);
 
+    Cookies.set("userId", data.id);
     Cookies.set("jwt", data.jwtToken);
 
     router.push("/");

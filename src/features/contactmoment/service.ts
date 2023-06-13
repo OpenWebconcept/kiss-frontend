@@ -72,14 +72,17 @@ export function koppelKlant({
 }: {
   klantId: string;
   contactmomentId: string;
+  anonymousKlant?: boolean;
 }) {
+  const _klantId = klantId ?? "85acb6b2-1b7c-4441-aaa9-6e0e0122d301";
+
   return fetchLoggedIn(window.gatewayBaseUri + "/api/klantcontactmomenten", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      klant: klantId,
+      klant: _klantId,
       contactmoment: contactmomentId,
       rol: "gesprekspartner",
     }),
@@ -103,6 +106,34 @@ export function useContactverzoekenByKlantId(
     url.searchParams.set("_limit", "10");
     url.searchParams.set("_page", page.value.toString());
     url.searchParams.set("embedded.klant._self.id", id.value);
+    url.searchParams.set("embedded.contactmoment.todo", "IS NOT NULL");
+    return url.toString();
+  }
+
+  return ServiceResult.fromFetcher(getUrl, fetchContactverzoeken, {
+    getUniqueId() {
+      return getUrl() + "contactverzoek";
+    },
+  });
+}
+
+export function useContactverzoekenByUserId(
+  id: Ref<string>,
+  page: Ref<number>
+) {
+  function getUrl() {
+    const url = new URL(window.gatewayBaseUri + "/api/contactmomenten");
+    url.searchParams.set(
+      "_order[embedded.contactmoment.registratiedatum]",
+      "desc"
+    );
+    url.searchParams.append("extend[]", "medewerker");
+    url.searchParams.append("extend[]", "embedded._self.owner");
+    url.searchParams.append("extend[]", "embedded.contactmoment.todo");
+    url.searchParams.append("extend[]", "embedded.contactmoment.afdeling");
+    url.searchParams.set("_limit", "10");
+    url.searchParams.set("_page", page.value.toString());
+    url.searchParams.set("_self.owner.id", id.value);
     url.searchParams.set("embedded.contactmoment.todo", "IS NOT NULL");
     return url.toString();
   }
