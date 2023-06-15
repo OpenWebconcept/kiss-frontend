@@ -1,8 +1,15 @@
 <template>
   <article :class="{ read: read }">
-    <div v-if="bericht.featured" class="featured">
-      <span class="icon-before alert" />
-      Belangrijk
+    <div class="indicators-container">
+      <div class="indicator intranet">
+        <span class="icon-before note" />
+        Intranet
+      </div>
+
+      <div v-if="bericht.featured" class="indicator important">
+        <span class="icon-before alert" />
+        Belangrijk
+      </div>
     </div>
 
     <small v-if="showType && bericht.type">
@@ -188,19 +195,36 @@ article {
   gap: 0.75rem;
   position: relative;
 
-  .featured {
+  .indicators-container {
+    width: 100%;
+    display: flex;
+  }
+
+  .indicator {
     display: flex;
     position: relative;
     width: fit-content;
     align-items: center;
     gap: var(--spacing-small);
-    color: var(--color-white);
-    background: var(--color-error);
-    border-top-right-radius: var(--radius-large);
-    border-bottom-right-radius: var(--radius-large);
     padding-inline: var(--spacing-large);
     padding-block: var(--spacing-small);
     top: calc(0.75rem * -1); // based on article padding
+  }
+
+  .important {
+    margin-left: auto;
+    color: var(--color-white);
+    background: var(--color-error);
+    border-top-left-radius: var(--radius-large);
+    border-bottom-left-radius: var(--radius-large);
+    right: calc(var(--text-margin) * -1); // based on article padding
+  }
+
+  .intranet {
+    color: var(--color-white);
+    background: black;
+    border-top-right-radius: var(--radius-large);
+    border-bottom-right-radius: var(--radius-large);
     left: calc(var(--text-margin) * -1); // based on article padding
   }
 
