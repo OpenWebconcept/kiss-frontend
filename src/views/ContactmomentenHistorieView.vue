@@ -72,13 +72,18 @@
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
 import ApplicationMessage from "@/components/ApplicationMessage.vue";
 import Pagination from "@/nl-design-system/components/Pagination.vue";
-import { ContactmomentenOverzicht } from "@/features/contactmoment";
+import {
+  ContactmomentenOverzicht,
+  getAnonymousUserId,
+} from "@/features/contactmoment";
 import { Heading as UtrechtHeading } from "@utrecht/component-library-vue";
 import Cookies from "js-cookie";
 import { ref } from "vue";
 import { useContactmomentenByUserId } from "@/features/shared/get-contactmomenten-service";
 import ContactverzoekenOverzicht from "@/features/contactmoment/ContactverzoekenOverzicht.vue";
 import { useContactverzoekenByUserId } from "@/features/contactmoment";
+
+getAnonymousUserId();
 
 const userId = ref(Cookies.get("userId") as string);
 

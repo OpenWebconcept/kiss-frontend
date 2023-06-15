@@ -66,15 +66,18 @@ export const koppelObject = (data: ContactmomentObject) =>
     body: JSON.stringify(data),
   }).then(throwIfNotOk);
 
-export function koppelKlant({
+export async function koppelKlant({
   klantId,
   contactmomentId,
 }: {
   klantId: string;
   contactmomentId: string;
-  anonymousKlant?: boolean;
 }) {
-  const _klantId = klantId ?? "85acb6b2-1b7c-4441-aaa9-6e0e0122d301";
+  let _klantId = klantId;
+
+  if (!_klantId) {
+    _klantId = await getAnonymousUserId(); // we're setting the "klant" to an anonymous one which is readily available in the data set
+  }
 
   return fetchLoggedIn(window.gatewayBaseUri + "/api/klantcontactmomenten", {
     method: "POST",
@@ -122,7 +125,7 @@ export function useContactverzoekenByUserId(
   page: Ref<number>
 ) {
   function getUrl() {
-    const url = new URL(window.gatewayBaseUri + "/api/contactmomenten");
+    const url = new URL(window.gatewayBaseUri + "/api/klantcontactmomenten");
     url.searchParams.set(
       "_order[embedded.contactmoment.registratiedatum]",
       "desc"
@@ -176,4 +179,15 @@ const mapContactverzoekDetail = (
     afwijkendOnderwerp: contactmoment.afwijkendOnderwerp,
     afdeling: contactmoment.embedded?.afdeling?.name,
   };
+};
+
+export const getAnonymousUserId = async (): Promise<string> => {
+  return fetchLoggedIn(
+    `${window.gatewayBaseUri}/api/klanten?functie=ANONYMOUS_USER` // if this filter does not work, the gateway should be enriched
+  )
+    .then(throwIfNotOk)
+    .then((r) => r.json())
+    .then(({ results }) => {
+      return results[0]?._id;
+    });
 };
