@@ -30,7 +30,10 @@ export function handleLogin() {
 }
 
 export function fetchLoggedIn(...args: FetchArgs): FetchReturn {
-  if (!validateSession()) Cookies.remove("jwt");
+  if (!validateSession()) {
+    Cookies.remove("jwt");
+    Cookies.remove("userId");
+  }
 
   const init = args[1] || {};
 

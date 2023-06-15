@@ -50,9 +50,16 @@
                 ><span>Zaken</span></router-link
               >
             </li>
+
             <li>
               <router-link :to="{ name: 'links' }"
                 ><span>Links</span></router-link
+              >
+            </li>
+
+            <li>
+              <router-link :to="{ name: 'contactmomenten-historie' }"
+                ><span>Contactmomenten historie</span></router-link
               >
             </li>
           </ul>

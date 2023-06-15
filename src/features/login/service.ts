@@ -44,5 +44,6 @@ export const logOut = () =>
       throw new Error("Logout failed");
     } else {
       Cookies.remove("jwt");
+      Cookies.remove("userId");
     }
   });
