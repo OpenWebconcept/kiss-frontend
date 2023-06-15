@@ -57,7 +57,7 @@
               >
             </li>
 
-            <li v-if="!contactmomentStore.contactmomentLoopt">
+            <li>
               <router-link :to="{ name: 'contactmomenten-historie' }"
                 ><span>Contactmomenten historie</span></router-link
               >

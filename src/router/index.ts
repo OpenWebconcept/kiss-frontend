@@ -108,7 +108,7 @@ const router = createRouter({
       path: "/contactmomenten-historie",
       name: "contactmomenten-historie",
       component: ContactmomentenHistorieView,
-      meta: { showNav: true, showNotice: true, showSearch: true },
+      meta: { showNav: true, showNotitie: true, showSearch: true },
     },
     redirectRoute,
   ],
