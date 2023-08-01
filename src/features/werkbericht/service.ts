@@ -11,7 +11,8 @@ import type { Ref } from "vue";
 import { fetchLoggedIn } from "@/services";
 
 const WP_MAX_ALLOWED_PAGE_SIZE = "100";
-const BERICHTEN_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_pub`;
+const BERICHTEN_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_proxy`;
+const LIMIT_PER_PAGE = 10;
 
 export type UseWerkberichtenParams = {
   typeId?: number;
@@ -176,7 +177,7 @@ export function useWerkberichten(
 
     const params: [string, string][] = [["extend[]", "_self.dateRead"]];
 
-    params.push(["_limit", "10"]);
+    params.push(["_limit", LIMIT_PER_PAGE.toString()]);
     params.push(["_order[modified]", "desc"]);
     params.push(["extend[]", "_self.self"]);
     params.push(["extend[]", "acf"]);
@@ -240,7 +241,14 @@ export function useWerkberichten(
     const sortedBerichten = [...featuredBerichten, ...regularBerichten];
 
     return parsePagination(
-      { ...json, results: sortedBerichten },
+      {
+        ...json,
+        limit: LIMIT_PER_PAGE,
+        total: parseInt(r.headers.get("X-Wp-Total") ?? "", 10),
+        pages: parseInt(r.headers.get("X-Wp-Totalpages") ?? "", 10),
+        page: parameters?.value.page,
+        results: sortedBerichten,
+      },
       (bericht: any) =>
         parseWerkbericht(
           bericht,
