@@ -8,4 +8,5 @@ export interface Werkbericht {
   read: boolean;
   url: string;
   featured: boolean;
+  intranet: boolean;
 }

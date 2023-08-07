@@ -93,6 +93,7 @@ function parseWerkbericht(
     skills: skillNames,
     url: jsonObject["_self"]?.self,
     featured: jsonObject.embedded.acf.publicationFeatured,
+    intranet: jsonObject["openpub-usage"]?.includes(5),
   };
 }
 

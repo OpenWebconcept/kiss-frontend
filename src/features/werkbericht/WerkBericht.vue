@@ -1,7 +1,7 @@
 <template>
   <article :class="{ read: read }">
     <div class="indicators-container">
-      <div class="indicator intranet">
+      <div v-if="bericht.intranet" class="indicator intranet">
         <span class="icon-before note" />
         Intranet
       </div>
