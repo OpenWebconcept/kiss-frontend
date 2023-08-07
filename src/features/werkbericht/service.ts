@@ -11,7 +11,9 @@ import type { Ref } from "vue";
 import { fetchLoggedIn } from "@/services";
 
 const WP_MAX_ALLOWED_PAGE_SIZE = "100";
-const BERICHTEN_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_pub`;
+const BERICHTEN_COLLECTION_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_proxy`;
+const BERICHTEN_DETAIL_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_pub`;
+const LIMIT_PER_PAGE = 10;
 
 export type UseWerkberichtenParams = {
   typeId?: number;
@@ -170,13 +172,13 @@ export function useWerkberichten(
     if (typesResult.state !== "success" || skillsResult.state !== "success")
       return "";
 
-    if (!parameters?.value) return BERICHTEN_BASE_URI;
+    if (!parameters?.value) return BERICHTEN_COLLECTION_BASE_URI;
 
     const { typeId, search, page, skillIds } = parameters.value;
 
     const params: [string, string][] = [["extend[]", "_self.dateRead"]];
 
-    params.push(["_limit", "10"]);
+    params.push(["_limit", LIMIT_PER_PAGE.toString()]);
     params.push(["_order[modified]", "desc"]);
     params.push(["extend[]", "_self.self"]);
     params.push(["extend[]", "acf"]);
@@ -208,7 +210,7 @@ export function useWerkberichten(
         ]);
       });
     }
-    return `${BERICHTEN_BASE_URI}?${new URLSearchParams(params)}`;
+    return `${BERICHTEN_COLLECTION_BASE_URI}?${new URLSearchParams(params)}`;
   }
 
   async function fetchBerichten(url: string): Promise<Paginated<Werkbericht>> {
@@ -240,7 +242,14 @@ export function useWerkberichten(
     const sortedBerichten = [...featuredBerichten, ...regularBerichten];
 
     return parsePagination(
-      { ...json, results: sortedBerichten },
+      {
+        ...json,
+        limit: LIMIT_PER_PAGE,
+        total: parseInt(r.headers.get("X-Wp-Total") ?? "", 10),
+        pages: parseInt(r.headers.get("X-Wp-Totalpages") ?? "", 10),
+        page: parameters?.value.page,
+        results: sortedBerichten,
+      },
       (bericht: any) =>
         parseWerkbericht(
           bericht,
@@ -275,7 +284,7 @@ export function useFeaturedWerkberichtenCount() {
       ["embedded.acf.publicationEndDate[after]", "now"],
     ];
 
-    return `${BERICHTEN_BASE_URI}?${new URLSearchParams(params)}`;
+    return `${BERICHTEN_COLLECTION_BASE_URI}?${new URLSearchParams(params)}`;
   }
 
   return ServiceResult.fromFetcher(getUrl(), fetchFeaturedWerkberichten, {
@@ -284,7 +293,9 @@ export function useFeaturedWerkberichtenCount() {
 }
 
 export async function readBericht(id: string): Promise<boolean> {
-  const res = await fetchLoggedIn(`${BERICHTEN_BASE_URI}/${id}?fields[]`);
+  const res = await fetchLoggedIn(
+    `${BERICHTEN_DETAIL_BASE_URI}/${id}?fields[]&extend[]=_self.dateRead`
+  );
 
   if (!res.ok)
     throw new Error(`Expected to read bericht: ${res.status.toString()}`);
@@ -293,14 +304,17 @@ export async function readBericht(id: string): Promise<boolean> {
 }
 
 export async function unreadBericht(id: string): Promise<boolean> {
-  const res = await fetchLoggedIn(`${BERICHTEN_BASE_URI}/${id}`, {
-    method: "PATCH",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ "@dateRead": false }),
-  });
+  const res = await fetchLoggedIn(
+    `${BERICHTEN_DETAIL_BASE_URI}/${id}?extend[]=_self.dateRead`,
+    {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ "@dateRead": false }),
+    }
+  );
 
   if (!res.ok)
     throw new Error(`Expected to unread bericht: ${res.status.toString()}`);

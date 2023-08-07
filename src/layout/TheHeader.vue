@@ -18,7 +18,8 @@
               <router-link :to="{ name: 'home' }">
                 <span>Nieuws en werkinstructies</span>
 
-                <span
+                <!-- Temporarily disabled due to Featured logic not working in Buren KISS -->
+                <!-- <span
                   v-if="
                     featuredWerkberichtenCount.success &&
                     featuredWerkberichtenCount.data > 0
@@ -29,7 +30,7 @@
                       ? featuredWerkberichtenCount.data
                       : "9+"
                   }}</span
-                >
+                > -->
               </router-link>
             </li>
 
