@@ -3,14 +3,16 @@ import { fetchLoggedIn } from "@/services";
 import type { Ref } from "vue";
 import type { SearchResult, Source } from "./types";
 
-function mapResult(obj: any): SearchResult {
-  const source = obj?.object_bron?.raw ?? "Website";
-  const id = obj?.id?.raw;
-  const title = obj?.headings?.raw?.[0] ?? obj?.title?.raw;
-  const content = obj?.body_content?.raw;
-  const url = parseValidUrl(obj?.url?.raw);
-  const jsonObject = JSON.parse(obj?.object?.raw ?? null);
-  const self = obj?.self?.raw;
+const searchURL = `${window.gatewayBaseUri}/api/dit_search`;
+
+function mapResult(object: any): SearchResult {
+  const source = getSourceName(object?._self?.schema?.name);
+  const jsonObject = object;
+  const id = object?._id;
+  const title = object?._self?.name;
+  const content = object?.body_content?.raw;
+  const url = parseValidUrl(object?.url?.raw);
+  const self = object?.self?.raw;
   return {
     source,
     id,
@@ -22,11 +24,6 @@ function mapResult(obj: any): SearchResult {
   };
 }
 
-const globalSearchBaseUri =
-  window.gatewayBaseUri + "/api/elastic/api/as/v1/engines/kiss-engine";
-
-const searchUrl = globalSearchBaseUri + "/search";
-
 export function useGlobalSearch(
   parameters: Ref<{
     search?: string;
@@ -34,46 +31,9 @@ export function useGlobalSearch(
     filters: Source[];
   }>
 ) {
-  function groupBy<K, V>(array: V[], grouper: (item: V) => K) {
-    return array.reduce((store, item) => {
-      const key = grouper(item);
-      if (!store.has(key)) {
-        store.set(key, [item]);
-      } else {
-        store.get(key)?.push(item);
-      }
-      return store;
-    }, new Map<K, V[]>());
-  }
-
   async function fetcher(): Promise<Paginated<SearchResult>> {
-    const payLoad = {
-      query: parameters.value.search,
-      page: {
-        current: parameters.value.page || 1,
-      },
-      filters: { any: [] as Record<string, string[]>[] },
-    };
-    if (
-      parameters?.value?.filters !== undefined &&
-      parameters?.value?.filters?.length > 0
-    ) {
-      const groupedFilters = groupBy(parameters.value.filters, (x) => x.type);
-      groupedFilters.forEach((value, key) => {
-        const sourceNames = value.map((source) => source.name);
-        const filter = {
-          [key]: sourceNames,
-        };
-        payLoad.filters.any.push(filter);
-      });
-    }
-
-    const r = await fetchLoggedIn(searchUrl, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payLoad),
+    const r = await fetchLoggedIn(searchURL, {
+      method: "GET",
     });
     if (!r.ok) throw new Error();
     const json = await r.json();
@@ -100,54 +60,18 @@ export function useGlobalSearch(
     )}`;
   }
 
-  return ServiceResult.fromFetcher(searchUrl, fetcher, {
+  return ServiceResult.fromFetcher(searchURL, fetcher, {
     getUniqueId,
   });
 }
 
-export function useSources() {
-  async function fetcher(): Promise<Source[]> {
-    const r = await fetchLoggedIn(searchUrl, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        query: "",
-        facets: {
-          object_bron: {
-            type: "value",
-          },
-          domains: {
-            type: "value",
-          },
-        },
-      }),
-    });
-    if (!r.ok) throw new Error();
-    const json = await r.json();
-    const { facets } = json ?? {};
-
-    if (typeof facets !== "object" || !facets) {
-      throw new Error();
-    }
-
-    const entries = Object.entries(facets) as [
-      string,
-      { data: { value: string }[] }[]
-    ][];
-
-    return entries.flatMap(([k, v]) =>
-      v.flatMap((x) =>
-        x.data.map((x) => ({
-          name: x.value,
-          type: k,
-        }))
-      )
-    );
+const getSourceName = (schemaName: string) => {
+  switch (schemaName) {
+    case "SDGProduct":
+      return "Kennisartikel";
+    case "Medewerker":
+      return "Smoelenboek";
+    default:
+      return "Onbekend";
   }
-
-  return ServiceResult.fromFetcher(globalSearchBaseUri, fetcher, {
-    getUniqueId: () => "sources",
-  });
-}
+};

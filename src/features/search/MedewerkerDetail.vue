@@ -16,7 +16,7 @@
 
   <content-feedback
     :name="title"
-    :url="medewerkerRaw.url"
+    :url="medewerkerRaw?.url"
     :current-section="currentFeedbackSection"
   />
 </template>

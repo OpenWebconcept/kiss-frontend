@@ -21,7 +21,7 @@ export default {
 <script lang="ts" setup>
 import { debouncedRef } from "@vueuse/core";
 import { computed } from "vue";
-import { useGlobalSearch, useSources } from "./service";
+import { useGlobalSearch } from "./service";
 import type { SearchResult } from "./types";
 import SearchCombobox from "@/components/SearchCombobox.vue";
 import { mapServiceData } from "@/services";
@@ -70,17 +70,18 @@ const searchText = computed({
 });
 const debouncedSearchText = debouncedRef(searchText, 300);
 
-const sources = useSources();
+const sources = [
+  { name: "Smoelenboek", type: "object_bron" },
+  { name: "Kennisartikel", type: "object_bron" },
+];
 
 const searchParams = computed(() => {
-  if (sources.success) {
-    const smoelen = sources.data.find((x) => x.name === "Smoelenboek");
-    if (smoelen) {
-      return {
-        filters: [smoelen],
-        search: debouncedSearchText.value,
-      };
-    }
+  const smoelen = sources.find((x) => x.name === "Smoelenboek");
+  if (smoelen) {
+    return {
+      filters: [smoelen],
+      search: debouncedSearchText.value,
+    };
   }
   return {
     filters: [],
