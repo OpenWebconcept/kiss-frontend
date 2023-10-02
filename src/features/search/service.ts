@@ -1,10 +1,4 @@
-import {
-  parseJson,
-  parseValidUrl,
-  ServiceResult,
-  throwIfNotOk,
-  type Paginated,
-} from "@/services";
+import { parseValidUrl, ServiceResult, type Paginated } from "@/services";
 import { fetchLoggedIn } from "@/services";
 import type { Ref } from "vue";
 import type { SearchResult, Source } from "./types";
@@ -32,8 +26,6 @@ const globalSearchBaseUri =
   window.gatewayBaseUri + "/api/elastic/api/as/v1/engines/kiss-engine";
 
 const searchUrl = globalSearchBaseUri + "/search";
-
-const suggestionUrl = globalSearchBaseUri + "/query_suggestion";
 
 export function useGlobalSearch(
   parameters: Ref<{
@@ -157,38 +149,5 @@ export function useSources() {
 
   return ServiceResult.fromFetcher(globalSearchBaseUri, fetcher, {
     getUniqueId: () => "sources",
-  });
-}
-
-export function useSuggestions(input: Ref<string>) {
-  function mapSuggestions(json: any): string[] {
-    if (!Array.isArray(json?.results?.documents)) return [];
-    return json.results.documents.map(({ suggestion }: any) => suggestion);
-  }
-  function fetchSuggestions() {
-    return fetchLoggedIn(suggestionUrl, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        query: input.value,
-        size: 10,
-        types: {
-          documents: {
-            fields: ["title", "body_content"],
-          },
-        },
-      }),
-    })
-      .then(throwIfNotOk)
-      .then(parseJson)
-      .then(mapSuggestions);
-  }
-  function getUniqueId() {
-    return input.value && "suggestions_" + input.value;
-  }
-  return ServiceResult.fromFetcher(suggestionUrl, fetchSuggestions, {
-    getUniqueId,
   });
 }
