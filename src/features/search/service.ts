@@ -32,7 +32,18 @@ export function useGlobalSearch(
   }>
 ) {
   async function fetcher(): Promise<Paginated<SearchResult>> {
-    const r = await fetchLoggedIn(searchURL, {
+    const _searchURL = new URL(searchURL);
+
+    if (parameters.value.filters) {
+      parameters.value.filters.forEach((filter) => {
+        _searchURL.searchParams.append(
+          "_self.schema.name[]",
+          getSchemaName(filter.name)
+        );
+      });
+    }
+
+    const r = await fetchLoggedIn(_searchURL, {
       method: "GET",
     });
     if (!r.ok) throw new Error();
@@ -71,6 +82,17 @@ const getSourceName = (schemaName: string) => {
       return "Kennisartikel";
     case "Medewerker":
       return "Smoelenboek";
+    default:
+      return "Onbekend";
+  }
+};
+
+const getSchemaName = (sourceName: string) => {
+  switch (sourceName) {
+    case "Kennisartikel":
+      return "SDGProduct";
+    case "Smoelenboek":
+      return "Medewerker";
     default:
       return "Onbekend";
   }
