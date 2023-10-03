@@ -5,19 +5,18 @@
     @submit.prevent="applySearch"
     ref="searchBarRef"
   >
-    <fieldset class="bronnen" v-if="sources.success">
-      <label v-for="bron in sources.data" :key="bron.name + bron.type">
+    <fieldset class="bronnen">
+      <label v-for="bron in sources" :key="bron.name + bron.type">
         <input type="checkbox" v-model="state.selectedSources" :value="bron" />
         {{ bron.name.replace(/(^\w+:|^)\/\//, "").replace("www.", "") }}
       </label>
     </fieldset>
     <div class="search-bar">
       <label for="global-search-input"> Zoekterm</label>
-      <search-combobox
-        :list-items="listItems"
+      <input
+        type="text"
         v-model="state.searchInput"
         placeholder="Zoeken"
-        @search.prevent="applySearch"
         id="global-search-input"
       />
       <button><span>Zoeken</span></button>
@@ -110,6 +109,7 @@
                   :title="title"
                   :heading-level="2"
                 />
+
                 <kennisartikel-detail
                   v-else-if="source === 'Kennisartikel'"
                   :kennisartikel-raw="jsonObject"
@@ -170,7 +170,7 @@ export default {
 <script lang="ts" setup>
 import { Heading as UtrechtHeading } from "@utrecht/component-library-vue";
 import { computed, nextTick, ref, watch } from "vue";
-import { useGlobalSearch, useSources, useSuggestions } from "./service";
+import { useGlobalSearch } from "./service";
 
 import Pagination from "@/nl-design-system/components/Pagination.vue";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
@@ -184,9 +184,6 @@ import type {
 } from "@/features/search/types";
 import { useContactmomentStore } from "@/stores/contactmoment";
 import { ensureState } from "@/stores/create-store";
-import SearchCombobox from "../../components/SearchCombobox.vue";
-import { mapServiceData } from "@/services";
-import { debouncedRef } from "@vueuse/core";
 
 const emit = defineEmits<{
   (
@@ -225,7 +222,11 @@ const searchParameters = computed(() => ({
 }));
 
 const searchResults = useGlobalSearch(searchParameters);
-const sources = useSources();
+
+const sources = [
+  { name: "Smoelenboek", type: "object_bron" },
+  { name: "Kennisartikel", type: "object_bron" },
+];
 
 const automaticSearchTimeout = ref<number | null>(null);
 
@@ -315,17 +316,6 @@ const handleWebsiteSelected = (website: Website): void => {
   contactmomentStore.addWebsite(website);
   window.open(website.url);
 };
-
-const debounceInput = debouncedRef(
-  computed(() => state.value.searchInput),
-  300
-);
-
-const suggestions = useSuggestions(debounceInput);
-
-const listItems = mapServiceData(suggestions, (items) =>
-  items.map((value) => ({ value }))
-);
 </script>
 
 <style lang="scss" scoped>
