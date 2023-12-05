@@ -11,7 +11,7 @@ import type { Ref } from "vue";
 import { fetchLoggedIn } from "@/services";
 
 const WP_MAX_ALLOWED_PAGE_SIZE = "100";
-const BERICHTEN_COLLECTION_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_proxy`;
+const BERICHTEN_COLLECTION_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_proxy/active`;
 const BERICHTEN_DETAIL_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_pub`;
 const LIMIT_PER_PAGE = 10;
 
@@ -68,7 +68,7 @@ function parseWerkbericht(
     : ["onbekend"];
 
   const dateCreated = parseDateStrWithTimezone(jsonObject.date);
-  const dateModified = parseDateStrWithTimezone(jsonObject.modified);
+  const dateModified = parseDateStrWithTimezone(jsonObject["date_modified"]);
 
   const dateLatest = maxDate([dateCreated, dateModified]);
 
@@ -182,7 +182,6 @@ export function useWerkberichten(
     params.push(["_order[modified]", "desc"]);
     params.push(["extend[]", "_self.self"]);
     params.push(["extend[]", "acf"]);
-    params.push(["embedded.acf.publicationEndDate[after]", "now"]);
 
     if (typeId) {
       params.push([
@@ -281,7 +280,6 @@ export function useFeaturedWerkberichtenCount() {
       ["embedded.acf.publicationFeatured[bool_compare]", "true"],
       ["fields[]", "_self.dateRead"],
       ["extend[]", "_self.dateRead"],
-      ["embedded.acf.publicationEndDate[after]", "now"],
     ];
 
     return `${BERICHTEN_COLLECTION_BASE_URI}?${new URLSearchParams(params)}`;
