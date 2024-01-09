@@ -9,7 +9,7 @@ import {
 import type { ZaakDetails } from "./types";
 import type { Ref } from "vue";
 import { mutate } from "swrv";
-import { formatIsoDate } from "@/helpers/date";
+import moment from "moment";
 
 type Roltype = "behandelaar" | "initiator";
 const ONBEKEND = "Onbekend";
@@ -34,6 +34,18 @@ const getNamePerRoltype = (zaak: any, roletype: Roltype) => {
   return name || ONBEKEND;
 };
 
+
+const IsoAndIntConverter = (date: any) => {
+  if (Number.isNaN(parseInt(date, 10))) {
+    return moment.duration(date).asDays()
+  }
+  if (!Number.isNaN(parseInt(date, 10))) {
+    return parseInt(date, 10)
+  }
+  return 0
+}
+
+
 const mapZaakDetails = (zaak: any) => {
   const startdatum = zaak.startdatum ? new Date(zaak.startdatum) : undefined;
 
@@ -41,7 +53,7 @@ const mapZaakDetails = (zaak: any) => {
     startdatum &&
     DateTime.fromJSDate(startdatum)
       .plus({
-        days: parseInt(zaak.embedded.zaaktype.doorlooptijd, 10),
+        days: IsoAndIntConverter(zaak.embedded?.zaaktype?.doorlooptijd),
       })
       .toJSDate();
 
@@ -49,15 +61,15 @@ const mapZaakDetails = (zaak: any) => {
     startdatum &&
     DateTime.fromJSDate(startdatum)
       .plus({
-        days: parseInt(zaak.embedded.zaaktype.servicenorm, 10),
+        days: IsoAndIntConverter(zaak.embedded?.zaaktype?.zervicenorm),
       })
       .toJSDate();
 
   return {
     ...zaak,
-    zaaktype: zaak.embedded.zaaktype.id,
-    zaaktypeLabel: zaak.embedded.zaaktype.onderwerp,
-    zaaktypeOmschrijving: zaak.embedded.zaaktype.omschrijving,
+    zaaktype: zaak.embedded?.zaaktype?.id ?? "onbekend",
+    zaaktypeLabel: zaak.embedded?.zaaktype?.onderwerp,
+    zaaktypeOmschrijving: zaak.embedded?.zaaktype?.omschrijving ?? "Onbekend",
     status: zaak.embedded?.status?.statustoelichting ?? "Onbekend",
     behandelaar: getNamePerRoltype(zaak, "behandelaar"),
     aanvrager: getNamePerRoltype(zaak, "initiator"),
@@ -66,7 +78,7 @@ const mapZaakDetails = (zaak: any) => {
     streefDatum: streefDatum,
     indienDatum: zaak.publicatiedatum && new Date(zaak.publicatiedatum),
     registratieDatum: zaak.registratiedatum && new Date(zaak.registratiedatum),
-    self: zaak["_self"].self,
+    self: zaak["_self"]?.self,
     documenten: mapDocumenten(zaak?.embedded?.zaakinformatieobjecten),
     omschrijving: zaak.omschrijving,
   } as ZaakDetails;
