@@ -7,7 +7,7 @@ import {
   fetchLoggedIn,
   throwIfNotOk,
   parseJson,
-  parsePagination,
+  parseWithoutPagination,
   ServiceResult,
   type ServiceData,
   enforceOneOrZero,
@@ -16,7 +16,7 @@ import { mutate } from "swrv";
 import type { Ref } from "vue";
 import type { Persoon } from "./types";
 
-const personenRootUrl = window.gatewayBaseUri + "/api/ingeschrevenpersonen";
+const personenRootUrl = window.gatewayBaseUri + "/api/brp_proxy/ingeschrevenpersonen";
 
 type QueryParam = [string, string][];
 
@@ -49,18 +49,18 @@ const queryDictionary: PersoonQueryParams = {
   bsn: (search) => [["burgerservicenummer", search]],
   geboortedatumAchternaam: (search) => [
     [
-      "embedded.geboorte.embedded.datumOnvolledig.datum",
+      "geboorte__datum",
       formatIsoDate(search.geboortedatum),
     ],
     ["embedded.naam.geslachtsnaam", search.achternaam],
   ],
   postcodeHuisnummer: ({ postcode, huisnummer }) => [
     [
-      "embedded.verblijfplaats.postcode",
+      "verblijfplaats__postcode",
       `${postcode.numbers}${postcode.digits}`,
     ],
 
-    ["embedded.verblijfplaats.huisnummer[int_compare]", huisnummer],
+    ["verblijfplaats__huisnummer", huisnummer],
   ],
 };
 
@@ -71,8 +71,8 @@ function getQueryParams<K extends PersoonSearchField>(params: PersoonQuery<K>) {
 }
 
 function mapPersoon(json: any): Persoon {
-  const { verblijfplaats, naam, geboorte } = json?.embedded ?? {};
-  const { plaats, land } = geboorte?.embedded ?? {};
+  const { verblijfplaats, naam, geboorte } = json ?? {};
+  const { plaats, land } = geboorte ?? {};
 
   const {
     postcode,
@@ -83,7 +83,7 @@ function mapPersoon(json: any): Persoon {
     huisnummertoevoeging,
   } = verblijfplaats ?? {};
 
-  const datum = geboorte?.embedded?.datumOnvolledig ?? {};
+  const datum = geboorte?.datum ?? {};
 
   const geboortedatum =
     datum && new Date(datum.jaar, datum.maand - 1, datum.dag);
@@ -97,9 +97,9 @@ function mapPersoon(json: any): Persoon {
     voornaam: naam?.voornamen,
     voorvoegselAchternaam: naam?.voorvoegsel,
     achternaam: naam?.geslachtsnaam,
-    geboorteplaats: plaats,
-    geboorteland: land,
-    woonplaats,
+    geboorteplaats: plaats ?? "-",
+    geboorteland: land ?? "-",
+    woonplaats: woonplaats ?? "-",
     straat,
     huisletter,
     huisnummertoevoeging,
@@ -118,8 +118,6 @@ function getPersoonSearchUrl<K extends PersoonSearchField>(
     url.searchParams.set(...tuple);
   });
 
-  url.searchParams.set("extend[]", "all");
-
   if (page !== undefined && page !== 1) {
     url.searchParams.set("_page", page.toString());
   }
@@ -131,7 +129,6 @@ function getPersoonUrlByBsn(bsn: string) {
   if (!bsn) return "";
   const url = new URL(personenRootUrl);
   url.searchParams.set("burgerservicenummer", bsn);
-  url.searchParams.set("extend[]", "all");
   return url.toString();
 }
 
@@ -148,7 +145,7 @@ export const searchPersonen = (url: string) => {
   return fetchLoggedIn(url)
     .then(throwIfNotOk)
     .then(parseJson)
-    .then((p) => parsePagination(p, mapPersoon))
+    .then((p) => parseWithoutPagination(p, mapPersoon))
     .then((p) => {
       p.page.forEach((persoon) => {
         const key = getPersoonUniqueBsnId(persoon.bsn);

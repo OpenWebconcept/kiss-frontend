@@ -30,6 +30,34 @@ export async function parsePagination<T>(
   };
 }
 
+export async function parseWithoutPagination<T>(
+  json: unknown,
+  map: (jObj: unknown) => T
+): Promise<Paginated<Awaited<T>>> {
+  const { _embedded } = json as {
+    [key: string]: any;
+  };
+
+  if (
+    !Array.isArray(_embedded?.ingeschrevenpersonen)
+
+  )
+    throw new Error(
+      "unexpected in gateway json. expected pagination: " + JSON.stringify(json)
+    );
+
+  // just in case the mapper is async, we wrap the result in a Promise
+  const promises = _embedded?.ingeschrevenpersonen.map((x: any) => Promise.resolve(map(x)));
+
+  return {
+    page: await Promise.all(promises),
+    pageNumber: 1,
+    pageSize: promises.length,
+    totalPages: 1,
+    totalRecords: promises.length,
+  };
+}
+
 //date format helper: 2005-12-30UTC01:02:03
 export const getFormattedUtcDate = () => {
   const formatDateTimeElement = (x: number) => ("0" + x).slice(-2);
