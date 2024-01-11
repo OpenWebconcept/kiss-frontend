@@ -52,7 +52,7 @@ const queryDictionary: PersoonQueryParams = {
       "geboorte__datum",
       formatIsoDate(search.geboortedatum),
     ],
-    ["embedded.naam.geslachtsnaam", search.achternaam],
+    ["naam__geslachtsnaam", search.achternaam],
   ],
   postcodeHuisnummer: ({ postcode, huisnummer }) => [
     [

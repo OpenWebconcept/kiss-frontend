@@ -248,7 +248,7 @@ export async function ensureKlantForBsn({
       bronorganisatie: window.organisatieIds[0],
       // TODO: WAT MOET HIER IN KOMEN?
       klantnummer: "123",
-      subjectIdentificatie: { inpBsn: bsn },
+      subjectIdentificatie: { inpBsn: bsn.toString() },
       subjectType: KlantType.Persoon,
       voornaam,
       voorvoegselAchternaam,
