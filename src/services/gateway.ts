@@ -1,4 +1,5 @@
 import type { Paginated } from "./pagination";
+import _ from "lodash"
 
 export async function parsePagination<T>(
   json: unknown,
@@ -7,6 +8,14 @@ export async function parsePagination<T>(
   const { results, limit, total, page, pages } = json as {
     [key: string]: unknown;
   };
+  
+  if (
+    results === "" || _.isEmpty(results)
+  )
+    throw new Error(
+      "Empty Results"
+    );
+
   if (
     !Array.isArray(results) ||
     typeof limit !== "number" ||
