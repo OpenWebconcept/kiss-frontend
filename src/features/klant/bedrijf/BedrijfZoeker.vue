@@ -3,7 +3,7 @@
     <fieldset class="radio-group">
       <legend>Waar wil je op zoeken?</legend>
       <label v-for="(label, field) in labels" :key="field">
-        <input type="radio" :value="field" v-model="state.field" required />
+        <input type="radio" :value="field" v-model="state.field" required :disabled="label === 'E-mailadres' || label === 'Telefoonnummer' || label === 'Postcode + Huisnummer' "  />
         {{ label }}
       </label>
     </fieldset>
@@ -39,7 +39,12 @@
       />
     </template>
     <application-message
-      v-if="bedrijven.error"
+      v-if="bedrijven.error && bedrijven.error.message === 'Empty Results'"
+      messageType="info"
+      message="Geen resultaten gevonden"
+    />
+    <application-message
+      v-if="bedrijven.error && bedrijven.error.message !== 'Empty Results'"
       messageType="error"
       message="Er is een fout opgetreden"
     />

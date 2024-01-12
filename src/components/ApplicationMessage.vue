@@ -10,9 +10,9 @@ import { defineProps, toRefs, onMounted, ref, type PropType } from "vue";
 const fade = ref(false);
 const props = defineProps({
   messageType: {
-    type: String as PropType<"error" | "confirm" | "warning">,
+    type: String as PropType<"error" | "confirm" | "warning" | "info">,
     validator: (value) => {
-      return value == "error" || value == "confirm" || value == "warning";
+      return value == "error" || value == "confirm" || value == "warning" || value == "info";
     },
     default: "confirm",
   },
@@ -46,6 +46,11 @@ article {
 
 .warning {
   background-color: var(--color-warning);
+}
+
+.info {
+  background-color: var(--color-info);
+  color: black
 }
 
 .fade {
