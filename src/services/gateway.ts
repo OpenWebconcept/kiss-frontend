@@ -48,6 +48,13 @@ export async function parseWithoutPagination<T>(
   };
 
   if (
+    _embedded === "" || _.isEmpty(_embedded)
+  )
+    throw new Error(
+      "Empty Results"
+    );
+
+  if (
     !Array.isArray(_embedded?.ingeschrevenpersonen)
 
   )
