@@ -39,12 +39,12 @@
       />
     </template>
     <application-message
-      v-if="bedrijven.error && bedrijven.error.message === 'Empty Results'"
+      v-if="bedrijven.error && bedrijven.error.message === 'Empty Results' || bedrijven.error.message === '404'"
       messageType="info"
       message="Geen resultaten gevonden"
     />
     <application-message
-      v-if="bedrijven.error && bedrijven.error.message !== 'Empty Results'"
+      v-if="bedrijven.error && bedrijven.error.message !== 'Empty Results' && bedrijven.error.message !== '404'"
       messageType="error"
       message="Er is een fout opgetreden"
     />
