@@ -110,7 +110,7 @@
         :current-page="state.nieuwsPage"
         @navigate="state.nieuwsPage = $event"
       />
-      <werk-berichten
+      <!-- <werk-berichten
         :level="2"
         v-if="werkInstructieId"
         header="Werkinstructies"
@@ -119,7 +119,7 @@
         :skill-ids="userStore.preferences.skills"
         :current-page="state.werkinstructiesPage"
         @navigate="state.werkinstructiesPage = $event"
-      />
+      /> -->
     </template>
   </div>
 </template>

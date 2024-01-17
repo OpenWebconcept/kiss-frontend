@@ -9,6 +9,7 @@ import {
 } from "@/services";
 import type { Ref } from "vue";
 import { fetchLoggedIn } from "@/services";
+import _ from "lodash";
 
 const WP_MAX_ALLOWED_PAGE_SIZE = "100";
 const BERICHTEN_COLLECTION_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_proxy/active`;
@@ -184,9 +185,14 @@ export function useWerkberichten(
     params.push(["extend[]", "acf"]);
 
     if (typeId) {
+      const typeData = typesResult.data.entries.find((entry) => entry[0] === typeId)
+      if (!typeData) return ""
+
+      const typeName = typeData[1] === "nieuws" ? "nieuwsbericht" : typeData[1]
+
       params.push([
-        "embedded.acf.publicationType[int_compare]",
-        typeId.toString(),
+        "openpub-type",
+        _.upperFirst(typeName),
       ]);
     }
 
@@ -203,9 +209,13 @@ export function useWerkberichten(
 
     if (skillIds?.length) {
       skillIds.forEach((skillId) => {
+
+        const skillName = skillsResult.data.entries.find((entry) => entry[0] === skillId)
+        if (!skillName) return ""
+
         params.push([
-          "embedded.acf.publicationSkill[int_compare][]",
-          skillId.toString(),
+          "openpub-audience[]",
+          _.upperFirst(skillName[1].toString()),
         ]);
       });
     }
@@ -277,7 +287,7 @@ export function useFeaturedWerkberichtenCount() {
 
   function getUrl() {
     const params: [string, string][] = [
-      ["embedded.acf.publicationFeatured[bool_compare]", "true"],
+      ["highlighted", "true"],
       ["fields[]", "_self.dateRead"],
       ["extend[]", "_self.dateRead"],
     ];
