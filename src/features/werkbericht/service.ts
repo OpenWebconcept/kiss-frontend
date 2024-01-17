@@ -44,8 +44,6 @@ function maxDate(dates: Date[]) {
  */
 function parseWerkbericht(
   jsonObject: any,
-  getBerichtTypeNameById: (id: number) => string | undefined,
-  getSkillNameById: (id: number) => string | undefined
 ): Werkbericht {
   if (
     typeof jsonObject?.embedded?.title?.rendered !== "string" ||
@@ -59,13 +57,13 @@ function parseWerkbericht(
   }
 
   const berichtTypeId = jsonObject?.embedded?.acf?.publicationType;
-  const berichtTypeName = getBerichtTypeNameById(berichtTypeId) ?? "onbekend";
+  const berichtTypeName = berichtTypeId.name ?? "onbekend";
 
   const skillIds = jsonObject?.embedded?.acf?.publicationSkill;
   const skillNames = Array.isArray(skillIds)
     ? skillIds.map(
-        (x) => (typeof x === "number" && getSkillNameById(x)) || "onbekend"
-      )
+      (skill) => skill.name || "onbekend"
+    )
     : ["onbekend"];
 
   const dateCreated = parseDateStrWithTimezone(jsonObject.date);
@@ -254,16 +252,14 @@ export function useWerkberichten(
       {
         ...json,
         limit: LIMIT_PER_PAGE,
-        total: parseInt(r.headers.get("X-Wp-Total") ?? "", 10),
-        pages: parseInt(r.headers.get("X-Wp-Totalpages") ?? "", 10),
+        total: json.total,
+        pages: json.pages,
         page: parameters?.value.page,
         results: sortedBerichten,
       },
       (bericht: any) =>
         parseWerkbericht(
           bericht,
-          typesResult.data.fromKeyToValue,
-          skillsResult.data.fromKeyToValue
         )
     );
   }
