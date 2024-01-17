@@ -9,6 +9,7 @@ import {
 } from "@/services";
 import type { Ref } from "vue";
 import { fetchLoggedIn } from "@/services";
+import _ from "lodash";
 
 const WP_MAX_ALLOWED_PAGE_SIZE = "100";
 const BERICHTEN_COLLECTION_BASE_URI = `${window.gatewayBaseUri}/api/kiss_openpub_proxy/active`;
@@ -43,8 +44,6 @@ function maxDate(dates: Date[]) {
  */
 function parseWerkbericht(
   jsonObject: any,
-  getBerichtTypeNameById: (id: number) => string | undefined,
-  getSkillNameById: (id: number) => string | undefined
 ): Werkbericht {
   if (
     typeof jsonObject?.embedded?.title?.rendered !== "string" ||
@@ -58,13 +57,13 @@ function parseWerkbericht(
   }
 
   const berichtTypeId = jsonObject?.embedded?.acf?.publicationType;
-  const berichtTypeName = getBerichtTypeNameById(berichtTypeId) ?? "onbekend";
+  const berichtTypeName = berichtTypeId.name ?? "onbekend";
 
   const skillIds = jsonObject?.embedded?.acf?.publicationSkill;
   const skillNames = Array.isArray(skillIds)
     ? skillIds.map(
-        (x) => (typeof x === "number" && getSkillNameById(x)) || "onbekend"
-      )
+      (skill) => skill.name || "onbekend"
+    )
     : ["onbekend"];
 
   const dateCreated = parseDateStrWithTimezone(jsonObject.date);
@@ -184,9 +183,14 @@ export function useWerkberichten(
     params.push(["extend[]", "acf"]);
 
     if (typeId) {
+      const typeData = typesResult.data.entries.find((entry) => entry[0] === typeId)
+      if (!typeData) return ""
+
+      const typeName = typeData[1] === "nieuws" ? "nieuwsbericht" : typeData[1]
+
       params.push([
-        "embedded.acf.publicationType[int_compare]",
-        typeId.toString(),
+        "openpub-type",
+        _.upperFirst(typeName),
       ]);
     }
 
@@ -203,9 +207,13 @@ export function useWerkberichten(
 
     if (skillIds?.length) {
       skillIds.forEach((skillId) => {
+
+        const skillName = skillsResult.data.entries.find((entry) => entry[0] === skillId)
+        if (!skillName) return ""
+
         params.push([
-          "embedded.acf.publicationSkill[int_compare][]",
-          skillId.toString(),
+          "openpub-audience[]",
+          _.upperFirst(skillName[1].toString()),
         ]);
       });
     }
@@ -244,16 +252,14 @@ export function useWerkberichten(
       {
         ...json,
         limit: LIMIT_PER_PAGE,
-        total: parseInt(r.headers.get("X-Wp-Total") ?? "", 10),
-        pages: parseInt(r.headers.get("X-Wp-Totalpages") ?? "", 10),
+        total: json.total,
+        pages: json.pages,
         page: parameters?.value.page,
         results: sortedBerichten,
       },
       (bericht: any) =>
         parseWerkbericht(
           bericht,
-          typesResult.data.fromKeyToValue,
-          skillsResult.data.fromKeyToValue
         )
     );
   }
@@ -277,7 +283,7 @@ export function useFeaturedWerkberichtenCount() {
 
   function getUrl() {
     const params: [string, string][] = [
-      ["embedded.acf.publicationFeatured[bool_compare]", "true"],
+      ["highlighted", "true"],
       ["fields[]", "_self.dateRead"],
       ["extend[]", "_self.dateRead"],
     ];
