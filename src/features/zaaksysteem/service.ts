@@ -108,8 +108,13 @@ export const useZakenByBsn = (bsn: Ref<string>) => {
     if (!bsn.value) return "";
     const url = new URL(zaaksysteemBaseUri);
     addExtends(url);
+    // url.searchParams.set(
+    //   "embedded.rollen.embedded.betrokkeneIdentificatie.inpBsn",
+    //   bsn.value
+    // );
+    // Quick zaken fix
     url.searchParams.set(
-      "embedded.rollen.embedded.betrokkeneIdentificatie.inpBsn",
+      "embedded.rollen.betrokkeneIdentificatie.inpBsn",
       bsn.value
     );
     return url.toString();
@@ -196,8 +201,12 @@ export const useZakenByVestigingsnummer = (vestigingsnummer: Ref<string>) => {
     if (!vestigingsnummer.value) return "";
     const url = new URL(zaaksysteemBaseUri);
     addExtends(url);
+    // url.searchParams.set(
+    //   "embedded.rollen.embedded.betrokkeneIdentificatie.vestigingsNummer",
+    //   vestigingsnummer.value
+    // );
     url.searchParams.set(
-      "embedded.rollen.embedded.betrokkeneIdentificatie.vestigingsNummer",
+      "embedded.rollen.betrokkeneIdentificatie.vestigingsNummer",
       vestigingsnummer.value
     );
     return url.toString();

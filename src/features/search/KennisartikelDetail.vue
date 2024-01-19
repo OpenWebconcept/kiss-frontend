@@ -90,7 +90,7 @@ const currentFeedbackSection = computed(() => {
 });
 
 const kennisartikel = computed<Record<string, string>>(() => {
-  const vertalingen = props.kennisartikelRaw.embedded.vertalingen || {};
+  const vertalingen = props.kennisartikelRaw.embedded?.vertalingen || {};
 
   if (!Array.isArray(vertalingen)) return {};
   return vertalingen.find(({ taal }) => taal === "nl") || {};

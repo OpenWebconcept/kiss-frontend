@@ -110,6 +110,8 @@ export function useContactverzoekenByKlantId(
     url.searchParams.set("_page", page.value.toString());
     url.searchParams.set("embedded.klant._self.id", id.value);
     url.searchParams.set("embedded.contactmoment.todo", "IS NOT NULL");
+    url.searchParams.set("klant", "IS NOT NULL");
+    url.searchParams.set("contactmoment", "IS NOT NULL");
     return url.toString();
   }
 
@@ -138,6 +140,8 @@ export function useContactverzoekenByUserId(
     url.searchParams.set("_page", page.value.toString());
     url.searchParams.set("_self.owner.id", id.value);
     url.searchParams.set("embedded.contactmoment.todo", "IS NOT NULL");
+    url.searchParams.set("klant", "IS NOT NULL");
+    url.searchParams.set("contactmoment", "IS NOT NULL");
     return url.toString();
   }
 

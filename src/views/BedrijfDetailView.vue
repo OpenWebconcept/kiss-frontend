@@ -13,26 +13,44 @@
     <simple-spinner v-if="klant.loading" />
     <bedrijf-details v-else-if="klant.success" :klant="klant.data" />
     <application-message
-      v-if="klant.error"
-      message="Er ging iets mis bij het ophalen van de klant. Probeer het later
-      nog eens."
+      v-if="klant.error && klant.error.message === 'Empty Results' || klant.error.message === '404'"
+      message="Geen klant gevonden."
+      messageType="info"
+    />
+
+    <application-message
+      v-if="klant.error && klant.error.message !== `Empty Results` && klant.error.message !== `404`"
+      message="Er ging iets mis bij het ophalen van de klant. Probeer het later nog eens."
       messageType="error"
     />
 
     <simple-spinner v-if="bedrijf.loading" />
     <handelsregister-gegevens
       v-if="bedrijf.success && bedrijf.data"
-      :bedrijf="bedrijf.data"
+      :bedrijven="bedrijf.data"
     />
     <application-message
-      v-if="bedrijf.error"
+      v-if="bedrijf.error && bedrijf.error.message === 'Empty Results' || bedrijf.error.message === '404'"
+      message="Geen bedrijf gevonden."
+      messageType="info"
+    />
+
+    <application-message
+      v-if="bedrijf.error && bedrijf.error.message !== `Empty Results` && bedrijf.error.message !== `404`"
       message="Er ging iets mis bij het ophalen van de Handelsregister gegevens. Probeer het later nog eens."
       messageType="error"
     />
 
+
     <simple-spinner v-if="contactverzoeken.loading" />
     <application-message
-      v-if="contactverzoeken.error"
+      v-if="contactverzoeken.error && contactverzoeken.error.message === 'Empty Results' || contactverzoeken.error.message === '404'"
+      message="Geen contactverzoeken gevonden."
+      messageType="info"
+    />
+
+    <application-message
+      v-if="contactverzoeken.error && contactverzoeken.error.message !== `Empty Results` && contactverzoeken.error.message !== `404`"
       message="Er ging iets mis bij het ophalen van de contactverzoeken. Probeer het later nog eens."
       messageType="error"
     />
@@ -51,10 +69,17 @@
     <simple-spinner v-if="zaken.loading" />
 
     <application-message
-      v-if="zaken.error"
+      v-if="zaken.error && zaken.error.message === 'Empty Results' || zaken.error.message === '404'"
+      message="Geen zaken gevonden."
+      messageType="info"
+    />
+
+    <application-message
+      v-if="zaken.error && zaken.error.message !== `Empty Results` && zaken.error.message !== `404`"
       message="Er ging iets mis bij het ophalen van de zaken. Probeer het later nog eens."
       messageType="error"
     />
+    
 
     <template v-if="zaken.success && zaken.data.page.length">
       <utrecht-heading :level="2"> Zaken </utrecht-heading>
@@ -70,10 +95,16 @@
     <simple-spinner v-if="contactmomenten.loading" />
 
     <application-message
-      v-if="contactmomenten.error"
+      v-if="contactmomenten.error && contactmomenten.error.message === 'Empty Results' || contactmomenten.error.message === '404'"
+      message="Geen contactmomenten gevonden."
+      messageType="info"
+    />
+
+    <application-message
+      v-if="contactmomenten.error && contactmomenten.error.message !== `Empty Results` && contactmomenten.error.message !== `404`"
       message="Er ging iets mis bij het ophalen van de contactmomenten. Probeer het later nog eens."
       messageType="error"
-    />
+    />   
 
     <template
       v-if="contactmomenten.success && contactmomenten.data.page.length"

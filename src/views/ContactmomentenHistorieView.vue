@@ -6,10 +6,16 @@
       <simple-spinner v-if="contactmomenten.loading" />
 
       <application-message
-        v-if="contactmomenten.error"
+        v-if="contactmomenten.error && contactmomenten.error.message === 'Empty Results' || contactmomenten.error.message === '404'"
+        message="Geen contactmomenten gevonden."
+        messageType="info"
+      />
+
+      <application-message
+        v-if="contactmomenten.error && contactmomenten.error.message !== `Empty Results` && contactmomenten.error.message !== `404`"
         message="Er ging iets mis bij het ophalen van de contactmomenten. Probeer het later nog eens."
         messageType="error"
-      />
+      /> 
 
       <utrecht-heading
         v-if="contactmomenten.success && !contactmomenten.data.page.length"
@@ -38,10 +44,16 @@
       <simple-spinner v-if="contactverzoeken.loading" />
 
       <application-message
-        v-if="contactverzoeken.error"
+        v-if="contactverzoeken.error && contactverzoeken.error.message === 'Empty Results' || contactverzoeken.error.message === '404'"
+        message="Geen contactverzoeken gevonden."
+        messageType="info"
+      />
+
+      <application-message
+        v-if="contactverzoeken.error && contactverzoeken.error.message !== `Empty Results` && contactverzoeken.error.message !== `404`"
         message="Er ging iets mis bij het ophalen van de contactverzoeken. Probeer het later nog eens."
         messageType="error"
-      />
+      /> 
 
       <utrecht-heading
         v-if="contactverzoeken.success && !contactverzoeken.data.page.length"
