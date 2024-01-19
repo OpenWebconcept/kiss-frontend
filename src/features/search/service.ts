@@ -36,7 +36,7 @@ export function useGlobalSearch(
 
     if (parameters.value.search) {
       _searchURL.searchParams.append(
-        "search",
+        "_search",
         parameters.value.search
       );
     }
@@ -44,7 +44,7 @@ export function useGlobalSearch(
     if (parameters.value.filters) {
       parameters.value.filters.forEach((filter) => {
         _searchURL.searchParams.append(
-          "_self.schema.name[]",
+          "_self.schema.ref[]",
           getSchemaName(filter.name)
         );
       });
