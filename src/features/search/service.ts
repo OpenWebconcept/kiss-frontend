@@ -34,6 +34,13 @@ export function useGlobalSearch(
   async function fetcher(): Promise<Paginated<SearchResult>> {
     const _searchURL = new URL(searchURL);
 
+    if (parameters.value.search) {
+      _searchURL.searchParams.append(
+        "search",
+        parameters.value.search
+      );
+    }
+
     if (parameters.value.filters) {
       parameters.value.filters.forEach((filter) => {
         _searchURL.searchParams.append(
@@ -90,9 +97,9 @@ const getSourceName = (schemaName: string) => {
 const getSchemaName = (sourceName: string) => {
   switch (sourceName) {
     case "Kennisartikel":
-      return "SDGProduct";
+      return "https://kissdevelopment.commonground.nu/kiss.sdgProduct.schema.json";
     case "Smoelenboek":
-      return "Medewerker";
+      return "https://kissdevelopment.commonground.nu/kiss.medewerker.schema.json";
     default:
       return "Onbekend";
   }

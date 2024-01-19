@@ -4,7 +4,7 @@
       <legend>Waar wil je op zoeken?</legend>
       <label v-for="(label, field) in labels" :key="field">
         <input type="radio" :value="field" v-model="state.field" required :disabled="label === 'E-mailadres' || label === 'Telefoonnummer' || label === 'Postcode + Huisnummer' "  />
-        {{ label }}
+        <span :class="{disabled: label === 'E-mailadres' || label === 'Telefoonnummer' || label === 'Postcode + Huisnummer'}">{{ label }}</span>
       </label>
     </fieldset>
     <fieldset class="search-bar">
@@ -147,6 +147,10 @@ input[type="search"] {
 .search-bar {
   margin-bottom: var(--spacing-large);
   width: min(100%, 20rem);
+}
+
+.disabled {
+  opacity: 0.5;
 }
 
 .pagination {

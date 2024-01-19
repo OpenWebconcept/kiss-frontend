@@ -1,5 +1,4 @@
 import {
-  enforceOneOrZero,
   fetchLoggedIn,
   parseJson,
   parsePagination,
@@ -126,7 +125,7 @@ export const useBedrijfByVestigingsnummer = (
   };
 
   const fetcher = (url: string) =>
-    searchBedrijvenInHandelsRegister(url).then(enforceOneOrZero);
+    searchBedrijvenInHandelsRegister(url);
 
   return ServiceResult.fromFetcher(getUrl, fetcher, {
     getUniqueId,
