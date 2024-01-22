@@ -36,7 +36,7 @@ export function useGlobalSearch(
 
     if (parameters.value.search) {
       _searchURL.searchParams.append(
-        "_search",
+        "_search[skills,function,department,user,description,embedded.contact.klantnummer,embedded.contact.voornaam,embedded.contact.achternaam,upnLabel,embedded.vertalingen.productTitelDecentraal,embedded.vertalingen.specifiekeTekst,embedded.vertalingen.synonyms.synonym,embedded.bevoegdeOrganisatie.naam,embedded.verantwoordelijkeOrganisatie.naam]",
         parameters.value.search
       );
     }
