@@ -136,6 +136,7 @@ function getKlantBsnUrl(bsn?: string) {
   const url = new URL(klantRootUrl);
   setExtend(url);
   url.searchParams.set("embedded.subjectIdentificatie.inpBsn", bsn);
+  url.searchParams.set("subjectType", "natuurlijk_persoon");
   return url.toString();
 }
 
