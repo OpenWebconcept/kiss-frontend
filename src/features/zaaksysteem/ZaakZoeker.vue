@@ -16,10 +16,15 @@
 
     <template v-if="store.currentSearch">
       <application-message
-        v-if="zaken.error"
+        v-if="zaken.error && zaken.error.message === `Empty Results` || zaken.error.message === `404`"
+        messageType="info"
+        message="Geen resultaten gevonden"
+      />
+      <application-message
+        v-if="zaken.error && zaken.error.message !== `Empty Results` && zaken.error.message !== `404`"
         messageType="error"
         message="Er is een probleem opgetreden."
-      ></application-message>
+      />
       <simple-spinner v-else-if="zaken.loading"></simple-spinner>
       <section class="resultaten-container" v-if="zaken.success">
         <zaken-overzicht
