@@ -59,7 +59,7 @@ type KlantSearchParameters<K extends KlantSearchField = KlantSearchField> = {
   page: Ref<number | undefined>;
 };
 
-const klantRootUrl = `${window.gatewayBaseUri}/api/klanten`;
+const klantRootUrl = `${window.gatewayBaseUri}/api/kic/v1/klanten`;
 
 function setExtend(url: URL) {
   url.searchParams.set("extend[]", "all");

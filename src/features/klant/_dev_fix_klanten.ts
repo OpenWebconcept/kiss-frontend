@@ -7,7 +7,7 @@ import {
 } from "@/services";
 import { KlantType } from "./types";
 
-const klantRootUrl = `${window.gatewayBaseUri}/api/klanten`;
+const klantRootUrl = `${window.gatewayBaseUri}/api/kic/v1/klanten`;
 
 const urlForKLantenWithoutSubjectType = (function getAllKlantenUrl() {
   const url = new URL(klantRootUrl);

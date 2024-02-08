@@ -18,7 +18,7 @@ import type {
 export const saveContactmoment = (
   data: Contactmoment
 ): Promise<{ id: string; url: string; gespreksId: string }> =>
-  fetchLoggedIn(window.gatewayBaseUri + "/api/contactmomenten", {
+  fetchLoggedIn(window.gatewayBaseUri + "/api/kic/v1/contactmomenten", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -79,7 +79,7 @@ export async function koppelKlant({
     _klantId = await getAnonymousUserId(); // we're setting the "klant" to an anonymous one which is readily available in the data set
   }
 
-  return fetchLoggedIn(window.gatewayBaseUri + "/api/klantcontactmomenten", {
+  return fetchLoggedIn(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -97,7 +97,7 @@ export function useContactverzoekenByKlantId(
   page: Ref<number>
 ) {
   function getUrl() {
-    const url = new URL(window.gatewayBaseUri + "/api/klantcontactmomenten");
+    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
     url.searchParams.set(
       "_order[embedded.contactmoment.registratiedatum]",
       "desc"
@@ -127,7 +127,7 @@ export function useContactverzoekenByUserId(
   page: Ref<number>
 ) {
   function getUrl() {
-    const url = new URL(window.gatewayBaseUri + "/api/klantcontactmomenten");
+    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
     url.searchParams.set(
       "_order[embedded.contactmoment.registratiedatum]",
       "desc"
@@ -187,7 +187,7 @@ const mapContactverzoekDetail = (
 
 export const getAnonymousUserId = async (): Promise<string> => {
   return fetchLoggedIn(
-    `${window.gatewayBaseUri}/api/klanten?functie=ANONYMOUS_USER` // if this filter does not work, the gateway should be enriched
+    `${window.gatewayBaseUri}/api/kic/v1/klanten?functie=ANONYMOUS_USER` // if this filter does not work, the gateway should be enriched
   )
     .then(throwIfNotOk)
     .then((r) => r.json())
