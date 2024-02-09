@@ -23,7 +23,7 @@ export interface Contactverzoek {
 }
 
 export function saveContactverzoek(data: Contactverzoek) {
-  const url = window.gatewayBaseUri + "/api/contactmomenten";
+  const url = window.gatewayBaseUri + "/api/kic/v1/contactmomenten";
   const registratiedatum = getFormattedUtcDate();
 
   return fetchLoggedIn(url, {
@@ -42,7 +42,7 @@ export function saveContactverzoek(data: Contactverzoek) {
 }
 
 export function createKlant(klant: NieuweKlant) {
-  const url = `${window.gatewayBaseUri}/api/klanten`;
+  const url = `${window.gatewayBaseUri}/api/kic/v1/klanten`;
   return fetchLoggedIn(url, {
     method: "POST",
     headers: {

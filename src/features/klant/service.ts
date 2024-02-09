@@ -2,11 +2,11 @@ import {
   ServiceResult,
   fetchLoggedIn,
   type Paginated,
-  parsePagination,
   throwIfNotOk,
   parseJson,
   type ServiceData,
   enforceOneOrZero,
+  parsePaginationKlantenPersonen,
 } from "@/services";
 import { mutate } from "swrv";
 import type { Ref } from "vue";
@@ -59,7 +59,7 @@ type KlantSearchParameters<K extends KlantSearchField = KlantSearchField> = {
   page: Ref<number | undefined>;
 };
 
-const klantRootUrl = `${window.gatewayBaseUri}/api/klanten`;
+const klantRootUrl = `${window.gatewayBaseUri}/api/kic/v1/klanten`;
 
 function setExtend(url: URL) {
   url.searchParams.set("extend[]", "all");
@@ -107,7 +107,7 @@ function searchKlanten(url: string): Promise<Paginated<Klant>> {
   return fetchLoggedIn(url)
     .then(throwIfNotOk)
     .then(parseJson)
-    .then((j) => parsePagination(j, mapKlant))
+    .then((j) => parsePaginationKlantenPersonen(j, mapKlant))
     .then((p) => {
       p.page.forEach((klant) => {
         const idUrl = getKlantIdUrl(klant.id);

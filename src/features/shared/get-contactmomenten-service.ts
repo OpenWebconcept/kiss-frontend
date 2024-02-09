@@ -110,7 +110,7 @@ export function useContactmomentenByKlantId(
   page: Ref<number>
 ) {
   function getUrl() {
-    const url = new URL(window.gatewayBaseUri + "/api/klantcontactmomenten");
+    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
     url.searchParams.set(
       "_order[embedded.contactmoment.registratiedatum]",
       "desc"
@@ -135,7 +135,7 @@ export function useContactmomentenByKlantId(
 
 export function useContactmomentenByUserId(id: Ref<string>, page: Ref<number>) {
   function getUrl() {
-    const url = new URL(window.gatewayBaseUri + "/api/klantcontactmomenten");
+    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
 
     url.searchParams.set(
       "_order[embedded.contactmoment.registratiedatum]",
