@@ -2,11 +2,11 @@ import {
   ServiceResult,
   fetchLoggedIn,
   type Paginated,
-  parsePagination,
   throwIfNotOk,
   parseJson,
   type ServiceData,
   enforceOneOrZero,
+  parsePaginationKlantenPersonen,
 } from "@/services";
 import { mutate } from "swrv";
 import type { Ref } from "vue";
@@ -107,7 +107,7 @@ function searchKlanten(url: string): Promise<Paginated<Klant>> {
   return fetchLoggedIn(url)
     .then(throwIfNotOk)
     .then(parseJson)
-    .then((j) => parsePagination(j, mapKlant))
+    .then((j) => parsePaginationKlantenPersonen(j, mapKlant))
     .then((p) => {
       p.page.forEach((klant) => {
         const idUrl = getKlantIdUrl(klant.id);
