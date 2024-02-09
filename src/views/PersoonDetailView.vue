@@ -89,9 +89,14 @@
     <!-- Contactmomenten -->
 
     <simple-spinner v-if="contactmomenten.loading" />
+    <application-message
+      v-if="contactmomenten.error && contactmomenten.error.message === 'Empty Results' || contactmomenten.error.message === '404'"
+      message="Geen contactmomenten gevonden."
+      messageType="info"
+    />
 
     <application-message
-      v-if="contactmomenten.error"
+      v-if="contactmomenten.error && contactmomenten.error.message !== `Empty Results` && contactmomenten.error.message !== `404`"
       message="Er ging iets mis bij het ophalen van de contactmomenten. Probeer het later nog eens."
       messageType="error"
     />
