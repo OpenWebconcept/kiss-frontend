@@ -87,7 +87,7 @@ const getSourceName = (schemaName: string) => {
   switch (schemaName) {
     case "SDGProduct":
       return "Kennisartikel";
-    case "Medewerker":
+    case "MedewerkerKiss":
       return "Smoelenboek";
     default:
       return "Onbekend";
