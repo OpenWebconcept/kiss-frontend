@@ -301,27 +301,6 @@
               <label />
 
               <div class="contactverzoek-container">
-                <div v-if="afdelingen.success && afdelingen.data.length">
-                  <label
-                    class="utrecht-form-label"
-                    :for="'verzoek-afdeling' + idx"
-                    >Afdeling</label
-                  >
-                  <select
-                    v-model="vraag.contactverzoek.afdeling"
-                    class="utrecht-select utrecht-select--html-select"
-                    :id="'verzoek-afdeling' + idx"
-                  >
-                    <option
-                      v-for="afdeling in afdelingen.data"
-                      :key="idx + afdeling.id"
-                      :value="afdeling.name"
-                    >
-                      {{ afdeling.name }}
-                    </option>
-                  </select>
-                </div>
-
                 <div>
                   <label
                     class="utrecht-form-label required"
@@ -402,6 +381,26 @@
               :id="'afwijkendOnderwerp' + idx"
               v-model="vraag.afwijkendOnderwerp"
             />
+
+            <label class="utrecht-form-label" :for="'verzoek-afdeling' + idx"
+              >Afdeling</label
+            >
+
+            <div v-if="afdelingen.success && afdelingen.data.length">
+              <select
+                v-model="vraag.contactverzoek.afdeling"
+                class="utrecht-select utrecht-select--html-select"
+                :id="'verzoek-afdeling' + idx"
+              >
+                <option
+                  v-for="afdeling in afdelingen.data"
+                  :key="idx + afdeling.id"
+                  :value="afdeling.id"
+                >
+                  {{ afdeling.name }}
+                </option>
+              </select>
+            </div>
 
             <label class="utrecht-form-label" :for="'notitie' + idx"
               >Notitie</label
@@ -498,10 +497,13 @@ const zakenToevoegenAanContactmoment = async (
 };
 
 const koppelKlanten = async (vraag: Vraag, contactmomentId: string) => {
-  for (const { shouldStore, klant } of vraag.klanten) {
-    if (shouldStore) {
-      await koppelKlant({ contactmomentId, klantId: klant.id });
-    }
+  if (!vraag.klanten.length) {
+    await koppelKlant({ contactmomentId, klantId: "" });
+
+    return;
+  }
+  for (const { klant } of vraag.klanten) {
+    await koppelKlant({ contactmomentId, klantId: klant.id });
   }
 };
 
@@ -538,6 +540,7 @@ const saveVraag = async (vraag: Vraag, gespreksId?: string) => {
     primaireVraag: vraag.primaireVraag?.url,
     primaireVraagWeergave: vraag.primaireVraag?.title,
     afwijkendOnderwerp: vraag.afwijkendOnderwerp || undefined,
+    afdeling: vraag.contactverzoek.afdeling,
   };
 
   addKennisartikelenToContactmoment(contactmoment, vraag);
@@ -554,13 +557,11 @@ const saveVraag = async (vraag: Vraag, gespreksId?: string) => {
       todo: {
         name: "contactverzoek",
         description: vraag.contactverzoek.notitie,
-        attendees: [
-          vraag.contactverzoek.medewerker,
-          vraag.contactverzoek.afdeling,
-        ].filter(Boolean),
+        attendees: [vraag.contactverzoek.medewerker].filter(Boolean),
       },
       primaireVraagWeergave: vraag.primaireVraag?.title,
       afwijkendOnderwerp: vraag.afwijkendOnderwerp || undefined,
+      afdeling: vraag.afdeling,
     });
 
     await koppelKlanten(vraag, contactverzoek.id);

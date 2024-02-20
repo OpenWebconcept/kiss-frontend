@@ -24,6 +24,7 @@ export interface Contactmoment {
   primaireVraag?: string;
   primaireVraagWeergave?: string;
   afwijkendOnderwerp?: string;
+  afdeling?: string;
 }
 
 export interface Gespreksresultaat {
@@ -48,4 +49,5 @@ export interface ContactverzoekDetail {
   notitie: string;
   primaireVraagWeergave?: string;
   afwijkendOnderwerp?: string;
+  afdeling?: string;
 }

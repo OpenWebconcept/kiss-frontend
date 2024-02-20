@@ -3,88 +3,26 @@
     <utrecht-heading :level="headingLevel">
       {{ title }}
     </utrecht-heading>
-    <div>
-      <section>
-        <utrecht-heading :level="headingLevel + 1"
-          >Algemene contactgegevens</utrecht-heading
-        >
-        <dl>
-          <dt>E-mailadres:</dt>
-          <dd>{{ emails }}</dd>
-          <dt>Telefoonnummer:</dt>
-          <dd>{{ telefoonnummers }}</dd>
-        </dl>
-      </section>
-      <section v-if="availabilities">
-        <utrecht-heading :level="headingLevel + 1">Agenda</utrecht-heading>
-        <table class="availability">
-          <thead>
-            <tr>
-              <th></th>
-              <th v-for="(_, day) in availabilities" :key="day">
-                {{ day }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">ochtend</th>
-              <td
-                v-for="(value, day) in availabilities"
-                :key="day"
-                :class="[value.ochtend ? 'groen' : 'rood']"
-              >
-                {{ value.ochtend ? "beschikbaar" : "niet beschikbaar" }}
-              </td>
-            </tr>
-            <tr>
-              <th scope="row">middag</th>
-              <td
-                v-for="(value, day) in availabilities"
-                :key="day"
-                :class="[value.middag ? 'groen' : 'rood']"
-              >
-                {{ value.middag ? "beschikbaar" : "niet beschikbaar" }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-    </div>
+
     <section>
-      <utrecht-heading :level="headingLevel + 1"
-        >Detailgegevens</utrecht-heading
-      >
-      <img
-        v-if="medewerkerRaw.optionalProfilePicture"
-        :src="medewerkerRaw.optionalProfilePicture"
-        width="128"
-      />
       <dl>
         <dt>Functie:</dt>
         <dd>{{ medewerkerRaw?.function }}</dd>
         <dt>Afdeling:</dt>
         <dd>{{ medewerkerRaw?.department }}</dd>
-        <dt>Wat kun je en wat doe je:</dt>
-        <dd>{{ medewerkerRaw?.skills }}</dd>
-        <template v-if="replacement">
-          <dt>Vervanger:</dt>
-          <dd>{{ replacement }}</dd>
-        </template>
       </dl>
     </section>
   </article>
 
   <content-feedback
     :name="title"
-    :url="medewerkerRaw.url"
+    :url="medewerkerRaw?.url"
     :current-section="currentFeedbackSection"
   />
 </template>
 
 <script lang="ts" setup>
 import { Heading as UtrechtHeading } from "@utrecht/component-library-vue";
-import { computed } from "@vue/reactivity";
 import { ContentFeedback } from "../feedback/index";
 import type { CurrentFeedbackSection } from "../feedback/types";
 
@@ -98,86 +36,25 @@ const currentFeedbackSection: CurrentFeedbackSection = {
   label: props.title,
   id: props.medewerkerRaw?.user,
 };
-
-const availabilities = computed(() => {
-  if (!props.medewerkerRaw?.availabilities) return null;
-
-  const days = ["maandag", "dinsdag", "woensdag", "donderdag", "vrijdag"];
-
-  let availabilities = {};
-
-  days.forEach((day) => {
-    availabilities = {
-      ...availabilities,
-      [day]: props.medewerkerRaw.availabilities[day],
-    };
-  });
-
-  return availabilities as any;
-});
-
-const telefoonnummers = computed(() =>
-  props.medewerkerRaw?.contact?.telefoonnummers
-    ?.map(({ telefoonnummer }: any) => telefoonnummer)
-    ?.filter(Boolean)
-    ?.join(", ")
-);
-
-const emails = computed(
-  () =>
-    props.medewerkerRaw?.contact?.emails
-      ?.map(({ email }: any) => email)
-      ?.filter(Boolean)
-      ?.join(", ") || props.medewerkerRaw?.user
-);
-
-const replacement = computed(() => {
-  if (typeof props.medewerkerRaw?.replacement === "string")
-    return props.medewerkerRaw.replacement;
-  if (typeof props.medewerkerRaw?.replacement?.name === "string")
-    return props.medewerkerRaw.replacement.name;
-  return "";
-});
 </script>
 
 <style lang="scss" scoped>
 article {
   display: grid;
-  gap: var(--spacing-default);
   grid-template-columns: 1fr 1fr;
   column-gap: var(--spacing-large);
 
-  > div {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-default);
+  h2 {
+    margin-block-end: var(--spacing-large);
   }
 
   > :first-child {
     grid-column: span 2;
   }
 
-  img {
-    margin-bottom: var(--spacing-default);
-  }
-
   section > :first-child {
-    margin-block-end: var(--spacing-default);
+    margin-block-end: var(--spacing-large);
   }
-}
-
-table {
-  border-collapse: separate;
-  border-spacing: var(--spacing-small);
-}
-table td {
-  font-size: 0;
-}
-.groen {
-  background-color: green;
-}
-.rood {
-  background-color: red;
 }
 
 dl {
@@ -193,9 +70,5 @@ dt {
 dd,
 dt {
   line-height: normal;
-}
-
-h2 {
-  margin-bottom: 1em;
 }
 </style>

@@ -1,3 +1,7 @@
+import Cookies from "js-cookie";
+import jwtDecode from "jwt-decode";
+import type { JwtPayload } from "jwt-decode";
+
 type FetchArgs = Parameters<typeof fetch>;
 type FetchReturn = ReturnType<typeof fetch>;
 
@@ -26,6 +30,11 @@ export function handleLogin() {
 }
 
 export function fetchLoggedIn(...args: FetchArgs): FetchReturn {
+  if (!validateSession()) {
+    Cookies.remove("jwt");
+    Cookies.remove("userId");
+  }
+
   const init = args[1] || {};
 
   if (!init.credentials) {
@@ -33,14 +42,35 @@ export function fetchLoggedIn(...args: FetchArgs): FetchReturn {
     args[1] = init;
   }
 
+  const options = args[1];
+
+  args[1] = {
+    ...options,
+    headers: {
+      ...options?.headers,
+      Authorization: `Bearer ${Cookies.get("jwt")}`,
+    },
+  };
+
   return fetch(...args).then((r) => {
     if (r.status === 401) {
       console.warn("session expired. waiting for user to log in...");
       return waitForLogin.promise.then(() => {
-        console.log("user is logged in again, resuming...");
         return fetchLoggedIn(...args);
       });
     }
     return r;
   });
 }
+
+const validateSession = () => {
+  const token = Cookies.get("jwt");
+
+  if (!token) return false;
+
+  const decoded = jwtDecode<JwtPayload>(token);
+
+  const expired = decoded?.exp && Date.now() >= decoded.exp * 1000;
+
+  return !expired;
+};

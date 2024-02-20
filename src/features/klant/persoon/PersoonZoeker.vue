@@ -56,7 +56,12 @@
         />
       </template>
       <application-message
-        v-if="klanten.error"
+        v-if="klanten.error && klanten.error.message === `Empty Results` || klanten.error.message === `404`"
+        messageType="info"
+        message="Geen resultaten gevonden"
+      />
+      <application-message
+        v-if="klanten.error && klanten.error.message !== `Empty Results` && klanten.error.message !== '404'"
         messageType="error"
         message="Er is een fout opgetreden"
       />
@@ -77,7 +82,12 @@
         />
       </template>
       <application-message
-        v-if="personen.error"
+        v-if="personen.error && personen.error.message === `Empty Results` || personen.error.message === `404`"
+        messageType="info"
+        message="Geen resultaten gevonden"
+      />
+      <application-message
+        v-if="personen.error && personen.error.message !== `Empty Results` && personen.error.message !== `404`"
         messageType="error"
         message="Er is een fout opgetreden"
       />
@@ -103,7 +113,7 @@ import { useRouter } from "vue-router";
 import SearchResultsCaption from "@/components/SearchResultsCaption.vue";
 import {
   parseBsn,
-  parseDutchDate,
+  parseGeboortedatumAchternaam,
   parsePostcodeHuisnummer,
 } from "@/helpers/validation";
 import {
@@ -118,7 +128,7 @@ type SearchFields = KlantSearchField | PersoonSearchField;
 const labels: {
   readonly [K in SearchFields]: string;
 } = {
-  geboortedatum: "Geboortedatum",
+  geboortedatumAchternaam: "Geboortedatum + achternaam",
   postcodeHuisnummer: "Postcode + huisnummer",
   email: "E-mailadres",
   telefoonnummer: "Telefoonnummer",
@@ -157,8 +167,8 @@ const currentKlantQuery = computed(() => {
 const currentPersoonQuery = computed(() => {
   const { currentSearch, field } = store.value;
 
-  if (field === "geboortedatum") {
-    const parsed = parseDutchDate(currentSearch);
+  if (field === "geboortedatumAchternaam") {
+    const parsed = parseGeboortedatumAchternaam(currentSearch);
     return parsed instanceof Error
       ? parsed
       : persoonQuery({

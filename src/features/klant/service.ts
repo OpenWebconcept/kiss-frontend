@@ -2,11 +2,11 @@ import {
   ServiceResult,
   fetchLoggedIn,
   type Paginated,
-  parsePagination,
   throwIfNotOk,
   parseJson,
   type ServiceData,
   enforceOneOrZero,
+  parsePaginationKlantenPersonen,
 } from "@/services";
 import { mutate } from "swrv";
 import type { Ref } from "vue";
@@ -59,7 +59,7 @@ type KlantSearchParameters<K extends KlantSearchField = KlantSearchField> = {
   page: Ref<number | undefined>;
 };
 
-const klantRootUrl = `${window.gatewayBaseUri}/api/klanten`;
+const klantRootUrl = `${window.gatewayBaseUri}/api/kic/v1/klanten`;
 
 function setExtend(url: URL) {
   url.searchParams.set("extend[]", "all");
@@ -107,7 +107,7 @@ function searchKlanten(url: string): Promise<Paginated<Klant>> {
   return fetchLoggedIn(url)
     .then(throwIfNotOk)
     .then(parseJson)
-    .then((j) => parsePagination(j, mapKlant))
+    .then((j) => parsePaginationKlantenPersonen(j, mapKlant))
     .then((p) => {
       p.page.forEach((klant) => {
         const idUrl = getKlantIdUrl(klant.id);
@@ -136,6 +136,7 @@ function getKlantBsnUrl(bsn?: string) {
   const url = new URL(klantRootUrl);
   setExtend(url);
   url.searchParams.set("embedded.subjectIdentificatie.inpBsn", bsn);
+  url.searchParams.set("subjectType", "natuurlijk_persoon");
   return url.toString();
 }
 
@@ -165,6 +166,15 @@ function updateContactgegevens({
   emails,
 }: UpdateContactgegevensParams): Promise<UpdateContactgegevensParams> {
   const url = klantRootUrl + "/" + id;
+
+  const mapKlantPayload = (klant: any) => {
+    const _klant = klant;
+
+    delete _klant.embedded;
+
+    return JSON.stringify({ ...klant, telefoonnummers, emails });
+  };
+
   return fetchLoggedIn(url + "?fields[]=klantnummer&fields[]=bronorganisatie")
     .then(throwIfNotOk)
     .then(parseJson)
@@ -174,13 +184,7 @@ function updateContactgegevens({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...klant,
-          embedded: {
-            telefoonnummers,
-            emails,
-          },
-        }),
+        body: mapKlantPayload(klant),
       })
     )
     .then(throwIfNotOk)
@@ -245,7 +249,7 @@ export async function ensureKlantForBsn({
       bronorganisatie: window.organisatieIds[0],
       // TODO: WAT MOET HIER IN KOMEN?
       klantnummer: "123",
-      subjectIdentificatie: { inpBsn: bsn },
+      subjectIdentificatie: { inpBsn: bsn.toString() },
       subjectType: KlantType.Persoon,
       voornaam,
       voorvoegselAchternaam,

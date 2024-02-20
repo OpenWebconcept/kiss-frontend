@@ -24,18 +24,34 @@
       v-if="persoon.success && persoon.data"
       :persoon="persoon.data"
     />
+  <application-message
+      v-if="persoon.error && persoon.error.message === 'Empty Results' || persoon.error.message === '404'"
+      message="Geen persoon gevonden."
+      messageType="info"
+    />
+
     <application-message
-      v-if="persoon.error"
+      v-if="persoon.error && persoon.error.message !== `Empty Results` && persoon.error.message !== `404`"
       message="Er ging iets mis bij het ophalen van de BRP gegevens. Probeer het later nog eens."
       messageType="error"
     />
 
+    
+
     <simple-spinner v-if="contactverzoeken.loading" />
     <application-message
-      v-if="contactverzoeken.error"
+      v-if="contactverzoeken.error && contactverzoeken.error.message === 'Empty Results' || contactverzoeken.error.message === '404'"
+      message="Geen contactverzoeken gevonden."
+      messageType="info"
+    />
+
+    <application-message
+      v-if="contactverzoeken.error && contactverzoeken.error.message !== `Empty Results` && contactverzoeken.error.message !== `404`"
       message="Er ging iets mis bij het ophalen van de contactverzoeken. Probeer het later nog eens."
       messageType="error"
     />
+
+
     <template
       v-if="contactverzoeken.success && contactverzoeken.data.page.length"
     >
@@ -48,10 +64,15 @@
 
     <!-- Zaken -->
 
-    <simple-spinner v-if="zaken.loading" />
+    <simple-spinner v-if="zaken.loading" /> 
+    <application-message
+      v-if="zaken.error && zaken.error.message === 'Empty Results' || zaken.error.message === '404'"
+      message="Geen zaken gevonden."
+      messageType="info"
+    />
 
     <application-message
-      v-if="zaken.error"
+      v-if="zaken.error && zaken.error.message !== `Empty Results` && zaken.error.message !== `404`"
       message="Er ging iets mis bij het ophalen van de zaken. Probeer het later nog eens."
       messageType="error"
     />
@@ -68,9 +89,14 @@
     <!-- Contactmomenten -->
 
     <simple-spinner v-if="contactmomenten.loading" />
+    <application-message
+      v-if="contactmomenten.error && contactmomenten.error.message === 'Empty Results' || contactmomenten.error.message === '404'"
+      message="Geen contactmomenten gevonden."
+      messageType="info"
+    />
 
     <application-message
-      v-if="contactmomenten.error"
+      v-if="contactmomenten.error && contactmomenten.error.message !== `Empty Results` && contactmomenten.error.message !== `404`"
       message="Er ging iets mis bij het ophalen van de contactmomenten. Probeer het later nog eens."
       messageType="error"
     />

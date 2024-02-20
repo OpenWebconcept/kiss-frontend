@@ -3,8 +3,8 @@
     <fieldset class="radio-group">
       <legend>Waar wil je op zoeken?</legend>
       <label v-for="(label, field) in labels" :key="field">
-        <input type="radio" :value="field" v-model="state.field" required />
-        {{ label }}
+        <input type="radio" :value="field" v-model="state.field" required :disabled="label === 'E-mailadres' || label === 'Telefoonnummer' || label === 'Postcode + Huisnummer' "  />
+        <span :class="{disabled: label === 'E-mailadres' || label === 'Telefoonnummer' || label === 'Postcode + Huisnummer'}">{{ label }}</span>
       </label>
     </fieldset>
     <fieldset class="search-bar">
@@ -39,7 +39,12 @@
       />
     </template>
     <application-message
-      v-if="bedrijven.error"
+      v-if="bedrijven.error && bedrijven.error.message === 'Empty Results' || bedrijven.error.message === '404'"
+      messageType="info"
+      message="Geen resultaten gevonden"
+    />
+    <application-message
+      v-if="bedrijven.error && bedrijven.error.message !== 'Empty Results' && bedrijven.error.message !== '404'"
       messageType="error"
       message="Er is een fout opgetreden"
     />
@@ -142,6 +147,10 @@ input[type="search"] {
 .search-bar {
   margin-bottom: var(--spacing-large);
   width: min(100%, 20rem);
+}
+
+.disabled {
+  opacity: 0.5;
 }
 
 .pagination {

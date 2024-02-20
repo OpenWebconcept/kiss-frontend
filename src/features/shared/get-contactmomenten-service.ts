@@ -51,6 +51,7 @@ const mapContactmoment = async (
 
   contactmoment.startdatum = new Date(contactmoment.startdatum);
   contactmoment.registratiedatum = new Date(contactmoment.registratiedatum);
+  contactmoment.afdeling = r.embedded.contactmoment?.embedded?.afdeling?.name;
 
   const objectcontactmomenten: any[] =
     r.embedded?.contactmoment?.embedded?.objectcontactmomenten ?? [];
@@ -109,7 +110,7 @@ export function useContactmomentenByKlantId(
   page: Ref<number>
 ) {
   function getUrl() {
-    const url = new URL(window.gatewayBaseUri + "/api/klantcontactmomenten");
+    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
     url.searchParams.set(
       "_order[embedded.contactmoment.registratiedatum]",
       "desc"
@@ -121,6 +122,35 @@ export function useContactmomentenByKlantId(
     url.searchParams.set("_page", page.value.toString());
     url.searchParams.set("embedded.klant._self.id", id.value);
     url.searchParams.set("embedded.contactmoment.todo", "IS NULL");
+    url.searchParams.set("klant", "IS NOT NULL");
+    url.searchParams.set("contactmoment", "IS NOT NULL");
+    return url.toString();
+  }
+  return ServiceResult.fromFetcher(getUrl, fetchContactmomenten, {
+    getUniqueId() {
+      return getUrl() + "contactmoment";
+    },
+  });
+}
+
+export function useContactmomentenByUserId(id: Ref<string>, page: Ref<number>) {
+  function getUrl() {
+    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
+
+    url.searchParams.set(
+      "_order[embedded.contactmoment.registratiedatum]",
+      "desc"
+    );
+    url.searchParams.append("extend[]", "medewerker");
+    url.searchParams.append("extend[]", "embedded._self.owner");
+    url.searchParams.append("extend[]", "embedded.contactmoment.todo");
+    url.searchParams.set("_limit", "10");
+    url.searchParams.set("_page", page.value.toString());
+    url.searchParams.set("_self.owner.id", id.value);
+    url.searchParams.set("embedded.contactmoment.todo", "IS NULL");
+    url.searchParams.set("klant", "IS NOT NULL");
+    url.searchParams.set("contactmoment", "IS NOT NULL");
+
     return url.toString();
   }
   return ServiceResult.fromFetcher(getUrl, fetchContactmomenten, {

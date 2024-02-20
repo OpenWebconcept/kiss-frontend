@@ -1,4 +1,5 @@
 import type { Paginated } from "./pagination";
+import _ from "lodash"
 
 export async function parsePagination<T>(
   json: unknown,
@@ -7,6 +8,14 @@ export async function parsePagination<T>(
   const { results, limit, total, page, pages } = json as {
     [key: string]: unknown;
   };
+  
+  if (
+    results === "" || _.isEmpty(results)
+  )
+    throw new Error(
+      "Empty Results"
+    );
+
   if (
     !Array.isArray(results) ||
     typeof limit !== "number" ||
@@ -27,6 +36,72 @@ export async function parsePagination<T>(
     pageSize: limit,
     totalPages: pages,
     totalRecords: total,
+  };
+}
+
+export async function parsePaginationKlantenPersonen<T>(
+  json: unknown,
+  map: (jObj: unknown) => T
+): Promise<Paginated<Awaited<T>>> {
+  const { results, limit, total, page, pages } = json as {
+    [key: string]: unknown;
+  };
+
+  if (
+    !Array.isArray(results) ||
+    typeof limit !== "number" ||
+    typeof total !== "number" ||
+    typeof page !== "number" ||
+    typeof pages !== "number"
+  )
+    throw new Error(
+      "unexpected in gateway json. expected pagination: " + JSON.stringify(json)
+    );
+
+  // just in case the mapper is async, we wrap the result in a Promise
+  const promises = results.map((x) => Promise.resolve(map(x)));
+
+  return {
+    page: await Promise.all(promises),
+    pageNumber: page,
+    pageSize: limit,
+    totalPages: pages,
+    totalRecords: total,
+  };
+}
+
+export async function parseWithoutPagination<T>(
+  json: unknown,
+  map: (jObj: unknown) => T
+): Promise<Paginated<Awaited<T>>> {
+  const { _embedded } = json as {
+    [key: string]: any;
+  };
+
+  if (
+    _embedded === "" || _.isEmpty(_embedded)
+  )
+    throw new Error(
+      "Empty Results"
+    );
+
+  if (
+    !Array.isArray(_embedded?.ingeschrevenpersonen)
+
+  )
+    throw new Error(
+      "unexpected in gateway json. expected pagination: " + JSON.stringify(json)
+    );
+
+  // just in case the mapper is async, we wrap the result in a Promise
+  const promises = _embedded?.ingeschrevenpersonen.map((x: any) => Promise.resolve(map(x)));
+
+  return {
+    page: await Promise.all(promises),
+    pageNumber: 1,
+    pageSize: promises.length,
+    totalPages: 1,
+    totalRecords: promises.length,
   };
 }
 

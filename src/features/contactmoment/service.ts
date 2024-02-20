@@ -18,7 +18,7 @@ import type {
 export const saveContactmoment = (
   data: Contactmoment
 ): Promise<{ id: string; url: string; gespreksId: string }> =>
-  fetchLoggedIn(window.gatewayBaseUri + "/api/contactmomenten", {
+  fetchLoggedIn(window.gatewayBaseUri + "/api/kic/v1/contactmomenten", {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -66,20 +66,26 @@ export const koppelObject = (data: ContactmomentObject) =>
     body: JSON.stringify(data),
   }).then(throwIfNotOk);
 
-export function koppelKlant({
+export async function koppelKlant({
   klantId,
   contactmomentId,
 }: {
   klantId: string;
   contactmomentId: string;
 }) {
-  return fetchLoggedIn(window.gatewayBaseUri + "/api/klantcontactmomenten", {
+  let _klantId = klantId;
+
+  if (!_klantId) {
+    _klantId = await getAnonymousUserId(); // we're setting the "klant" to an anonymous one which is readily available in the data set
+  }
+
+  return fetchLoggedIn(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      klant: klantId,
+      klant: _klantId,
       contactmoment: contactmomentId,
       rol: "gesprekspartner",
     }),
@@ -91,7 +97,7 @@ export function useContactverzoekenByKlantId(
   page: Ref<number>
 ) {
   function getUrl() {
-    const url = new URL(window.gatewayBaseUri + "/api/klantcontactmomenten");
+    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
     url.searchParams.set(
       "_order[embedded.contactmoment.registratiedatum]",
       "desc"
@@ -99,10 +105,43 @@ export function useContactverzoekenByKlantId(
     url.searchParams.append("extend[]", "medewerker");
     url.searchParams.append("extend[]", "embedded._self.owner");
     url.searchParams.append("extend[]", "embedded.contactmoment.todo");
+    url.searchParams.append("extend[]", "embedded.contactmoment.afdeling");
     url.searchParams.set("_limit", "10");
     url.searchParams.set("_page", page.value.toString());
     url.searchParams.set("embedded.klant._self.id", id.value);
     url.searchParams.set("embedded.contactmoment.todo", "IS NOT NULL");
+    url.searchParams.set("klant", "IS NOT NULL");
+    url.searchParams.set("contactmoment", "IS NOT NULL");
+    return url.toString();
+  }
+
+  return ServiceResult.fromFetcher(getUrl, fetchContactverzoeken, {
+    getUniqueId() {
+      return getUrl() + "contactverzoek";
+    },
+  });
+}
+
+export function useContactverzoekenByUserId(
+  id: Ref<string>,
+  page: Ref<number>
+) {
+  function getUrl() {
+    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
+    url.searchParams.set(
+      "_order[embedded.contactmoment.registratiedatum]",
+      "desc"
+    );
+    url.searchParams.append("extend[]", "medewerker");
+    url.searchParams.append("extend[]", "embedded._self.owner");
+    url.searchParams.append("extend[]", "embedded.contactmoment.todo");
+    url.searchParams.append("extend[]", "embedded.contactmoment.afdeling");
+    url.searchParams.set("_limit", "10");
+    url.searchParams.set("_page", page.value.toString());
+    url.searchParams.set("_self.owner.id", id.value);
+    url.searchParams.set("embedded.contactmoment.todo", "IS NOT NULL");
+    url.searchParams.set("klant", "IS NOT NULL");
+    url.searchParams.set("contactmoment", "IS NOT NULL");
     return url.toString();
   }
 
@@ -138,9 +177,21 @@ const mapContactverzoekDetail = (
     behandelaar: todo.attendees?.[0] ?? "-",
     afgerond: todo.completed ? formatDateOnly(new Date(todo.completed)) : "-",
     starttijd: formatTimeOnly(new Date(contactmoment.registratiedatum)),
-    aanmaker: contactmoment["_self"].owner,
+    aanmaker: contactmoment["_self"].owner.name,
     notitie: todo.description,
     primaireVraagWeergave: contactmoment.primaireVraagWeergave,
     afwijkendOnderwerp: contactmoment.afwijkendOnderwerp,
+    afdeling: contactmoment.embedded?.afdeling?.name,
   };
+};
+
+export const getAnonymousUserId = async (): Promise<string> => {
+  return fetchLoggedIn(
+    `${window.gatewayBaseUri}/api/kic/v1/klanten?functie=ANONYMOUS_USER` // if this filter does not work, the gateway should be enriched
+  )
+    .then(throwIfNotOk)
+    .then((r) => r.json())
+    .then(({ results }) => {
+      return results[0]?._id;
+    });
 };

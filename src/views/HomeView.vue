@@ -110,7 +110,7 @@
         :current-page="state.nieuwsPage"
         @navigate="state.nieuwsPage = $event"
       />
-      <werk-berichten
+      <!-- <werk-berichten
         :level="2"
         v-if="werkInstructieId"
         header="Werkinstructies"
@@ -119,14 +119,14 @@
         :skill-ids="userStore.preferences.skills"
         :current-page="state.werkinstructiesPage"
         @navigate="state.werkinstructiesPage = $event"
-      />
+      /> -->
     </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Heading as UtrechtHeading } from "@utrecht/component-library-vue";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import {
   useBerichtTypes,
   useSkills,
@@ -136,6 +136,9 @@ import { parseValidInt } from "@/services";
 import MultiSelect from "@/components/MultiSelect.vue";
 import { useUserStore } from "@/stores/user";
 import { ensureState } from "@/stores/create-store";
+import { useCurrentUser } from "@/features/login/service";
+
+useCurrentUser(); // init current user after login
 
 const { pubBeheerUrl } = window;
 

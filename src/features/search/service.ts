@@ -1,22 +1,18 @@
-import {
-  parseJson,
-  parseValidUrl,
-  ServiceResult,
-  throwIfNotOk,
-  type Paginated,
-} from "@/services";
+import { parseValidUrl, ServiceResult, type Paginated } from "@/services";
 import { fetchLoggedIn } from "@/services";
 import type { Ref } from "vue";
 import type { SearchResult, Source } from "./types";
 
-function mapResult(obj: any): SearchResult {
-  const source = obj?.object_bron?.raw ?? "Website";
-  const id = obj?.id?.raw;
-  const title = obj?.headings?.raw?.[0] ?? obj?.title?.raw;
-  const content = obj?.body_content?.raw;
-  const url = parseValidUrl(obj?.url?.raw);
-  const jsonObject = JSON.parse(obj?.object?.raw ?? null);
-  const self = obj?.self?.raw;
+const searchURL = `${window.gatewayBaseUri}/api/dit_search`;
+
+function mapResult(object: any): SearchResult {
+  const source = getSourceName(object?._self?.schema?.name);
+  const jsonObject = object;
+  const id = object?._id;
+  const title = object?._self?.name;
+  const content = object?.body_content?.raw;
+  const url = parseValidUrl(object?.url?.raw);
+  const self = object?.self?.raw;
   return {
     source,
     id,
@@ -28,13 +24,6 @@ function mapResult(obj: any): SearchResult {
   };
 }
 
-const globalSearchBaseUri =
-  window.gatewayBaseUri + "/api/elastic/api/as/v1/engines/kiss-engine";
-
-const searchUrl = globalSearchBaseUri + "/search";
-
-const suggestionUrl = globalSearchBaseUri + "/query_suggestion";
-
 export function useGlobalSearch(
   parameters: Ref<{
     search?: string;
@@ -42,46 +31,27 @@ export function useGlobalSearch(
     filters: Source[];
   }>
 ) {
-  function groupBy<K, V>(array: V[], grouper: (item: V) => K) {
-    return array.reduce((store, item) => {
-      const key = grouper(item);
-      if (!store.has(key)) {
-        store.set(key, [item]);
-      } else {
-        store.get(key)?.push(item);
-      }
-      return store;
-    }, new Map<K, V[]>());
-  }
-
   async function fetcher(): Promise<Paginated<SearchResult>> {
-    const payLoad = {
-      query: parameters.value.search,
-      page: {
-        current: parameters.value.page || 1,
-      },
-      filters: { any: [] as Record<string, string[]>[] },
-    };
-    if (
-      parameters?.value?.filters !== undefined &&
-      parameters?.value?.filters?.length > 0
-    ) {
-      const groupedFilters = groupBy(parameters.value.filters, (x) => x.type);
-      groupedFilters.forEach((value, key) => {
-        const sourceNames = value.map((source) => source.name);
-        const filter = {
-          [key]: sourceNames,
-        };
-        payLoad.filters.any.push(filter);
+    const _searchURL = new URL(searchURL);
+
+    if (parameters.value.search) {
+      _searchURL.searchParams.append(
+        "_search[skills,function,department,user,description,embedded.contact.klantnummer,embedded.contact.voornaam,embedded.contact.achternaam,upnLabel,embedded.vertalingen.productTitelDecentraal,embedded.vertalingen.specifiekeTekst,embedded.vertalingen.synonyms.synonym,embedded.bevoegdeOrganisatie.naam,embedded.verantwoordelijkeOrganisatie.naam]",
+        parameters.value.search
+      );
+    }
+
+    if (parameters.value.filters) {
+      parameters.value.filters.forEach((filter) => {
+        _searchURL.searchParams.append(
+          "_self.schema.ref[]",
+          getSchemaName(filter.name)
+        );
       });
     }
 
-    const r = await fetchLoggedIn(searchUrl, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(payLoad),
+    const r = await fetchLoggedIn(_searchURL, {
+      method: "GET",
     });
     if (!r.ok) throw new Error();
     const json = await r.json();
@@ -108,87 +78,29 @@ export function useGlobalSearch(
     )}`;
   }
 
-  return ServiceResult.fromFetcher(searchUrl, fetcher, {
+  return ServiceResult.fromFetcher(searchURL, fetcher, {
     getUniqueId,
   });
 }
 
-export function useSources() {
-  async function fetcher(): Promise<Source[]> {
-    const r = await fetchLoggedIn(searchUrl, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        query: "",
-        facets: {
-          object_bron: {
-            type: "value",
-          },
-          domains: {
-            type: "value",
-          },
-        },
-      }),
-    });
-    if (!r.ok) throw new Error();
-    const json = await r.json();
-    const { facets } = json ?? {};
-
-    if (typeof facets !== "object" || !facets) {
-      throw new Error();
-    }
-
-    const entries = Object.entries(facets) as [
-      string,
-      { data: { value: string }[] }[]
-    ][];
-
-    return entries.flatMap(([k, v]) =>
-      v.flatMap((x) =>
-        x.data.map((x) => ({
-          name: x.value,
-          type: k,
-        }))
-      )
-    );
+const getSourceName = (schemaName: string) => {
+  switch (schemaName) {
+    case "SDGProduct":
+      return "Kennisartikel";
+    case "MedewerkerKiss":
+      return "Smoelenboek";
+    default:
+      return "Onbekend";
   }
+};
 
-  return ServiceResult.fromFetcher(globalSearchBaseUri, fetcher, {
-    getUniqueId: () => "sources",
-  });
-}
-
-export function useSuggestions(input: Ref<string>) {
-  function mapSuggestions(json: any): string[] {
-    if (!Array.isArray(json?.results?.documents)) return [];
-    return json.results.documents.map(({ suggestion }: any) => suggestion);
+const getSchemaName = (sourceName: string) => {
+  switch (sourceName) {
+    case "Kennisartikel":
+      return "https://kissdevelopment.commonground.nu/kiss.sdgProduct.schema.json";
+    case "Smoelenboek":
+      return "https://kissdevelopment.commonground.nu/kiss.medewerker.schema.json";
+    default:
+      return "Onbekend";
   }
-  function fetchSuggestions() {
-    return fetchLoggedIn(suggestionUrl, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        query: input.value,
-        size: 10,
-        types: {
-          documents: {
-            fields: ["title", "body_content"],
-          },
-        },
-      }),
-    })
-      .then(throwIfNotOk)
-      .then(parseJson)
-      .then(mapSuggestions);
-  }
-  function getUniqueId() {
-    return input.value && "suggestions_" + input.value;
-  }
-  return ServiceResult.fromFetcher(suggestionUrl, fetchSuggestions, {
-    getUniqueId,
-  });
-}
+};

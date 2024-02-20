@@ -3,8 +3,8 @@
     <utrecht-heading :level="level">{{ header }}</utrecht-heading>
 
     <paragraph v-if="berichten.state === 'error'">{{
-      getErrorMessage(berichten.error)
-    }}</paragraph>
+      berichten.error.message === 'Empty Results' || berichten.error.message === '404' ? getEmptyErrorMessage(berichten.error) : getErrorMessage(berichten.error)}}
+    </paragraph>
 
     <template v-else-if="berichten.state === 'success'">
       <paragraph v-if="search"
@@ -68,6 +68,10 @@ const props = defineProps({
   getErrorMessage: {
     type: Function as PropType<(e: Error) => string>,
     default: () => "Er ging iets mis. Probeer het later nog eens.",
+  },
+  getEmptyErrorMessage: {
+    type: Function as PropType<(e: Error) => string>,
+    default: () => "Geen resultaten gevonden.",
   },
   pageParamName: {
     type: String,

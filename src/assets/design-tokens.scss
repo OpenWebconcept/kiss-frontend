@@ -12,6 +12,7 @@
     --color-error-hover: #f47171;
     --color-error-hover-text: var(--color-headings);
     --color-warning: orange;
+    --color-info: lightblue;
     --color-category-default: hsl(184, 54%, 70%);
     --color-category-website: hsl(285, 56%, 83%);
     --color-white: #fff;
@@ -68,6 +69,11 @@
     --denhaag-pagination-link-current-color: var(--color-headings);
     --utrecht-border-width-sm: 1px;
     --utrecht-color-grey-90: var(--color-tertiary);
+
+    --utrecht-separator-margin-block-start: 5px;
+    --utrecht-separator-margin-block-end: 5px;
+    --utrecht-separator-block-size: 1px;
+    --utrecht-separator-color: var(--color-tertiary);
 
     /* h1 */
     --utrecht-heading-1-line-height: 4.25rem;

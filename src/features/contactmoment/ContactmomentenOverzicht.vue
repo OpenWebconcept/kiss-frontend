@@ -17,7 +17,7 @@
                 formatDateOnly(contactmoment.registratiedatum)
               }}</span>
               <span aria-describedby="medewerker-header">{{
-                contactmoment["_self"].owner
+                contactmoment["_self"].owner.name
               }}</span>
               <span aria-describedby="kanaal-header">{{
                 contactmoment.kanaal
@@ -46,10 +46,26 @@
                 <dt>Zaaktype</dt>
                 <dd>{{ zaak.zaaktype }}</dd>
                 <dt>Status</dt>
-                <dd>{{ zaak.status }}</dd>
+                <dd>
+                  <span v-if="zaak.status">{{ zaak.status }}</span>
+                  <span v-else>Geen status</span>
+                </dd>
               </template>
               <dt>Notitie</dt>
-              <dd class="tekst">{{ contactmoment.tekst }}</dd>
+              <dd class="tekst">
+                <span v-if="contactmoment.tekst">{{
+                  contactmoment.tekst
+                }}</span>
+                <span v-else>Geen notitie</span>
+              </dd>
+
+              <dt>Afdeling</dt>
+              <dd>
+                <span v-if="contactmoment.afdeling">{{
+                  contactmoment.afdeling
+                }}</span>
+                <span v-else>Geen afdeling</span>
+              </dd>
             </dl>
             <p
               v-for="(
