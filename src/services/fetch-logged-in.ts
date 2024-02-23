@@ -6,7 +6,7 @@ type FetchArgs = Parameters<typeof fetch>;
 type FetchReturn = ReturnType<typeof fetch>;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-const empty = () => {};
+const empty = () => { };
 
 const waitForLogin = {
   promise: Promise.resolve(),
@@ -33,6 +33,7 @@ export function fetchLoggedIn(...args: FetchArgs): FetchReturn {
   if (!validateSession()) {
     Cookies.remove("jwt");
     Cookies.remove("userId");
+    window.sessionStorage.removeItem("jwt")
   }
 
   const init = args[1] || {};
@@ -48,7 +49,7 @@ export function fetchLoggedIn(...args: FetchArgs): FetchReturn {
     ...options,
     headers: {
       ...options?.headers,
-      Authorization: `Bearer ${Cookies.get("jwt")}`,
+      Authorization: `Bearer ${Cookies.get("jwt") ?? window.sessionStorage.getItem("jwt")}`,
     },
   };
 
@@ -64,7 +65,7 @@ export function fetchLoggedIn(...args: FetchArgs): FetchReturn {
 }
 
 const validateSession = () => {
-  const token = Cookies.get("jwt");
+  const token = Cookies.get("jwt") ?? window.sessionStorage.getItem("jwt");
 
   if (!token) return false;
 
