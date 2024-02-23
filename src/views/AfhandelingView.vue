@@ -382,7 +382,7 @@
               v-model="vraag.afwijkendOnderwerp"
             />
 
-            <label class="utrecht-form-label" :for="'verzoek-afdeling' + idx"
+            <label class="utrecht-form-label required" :for="'verzoek-afdeling' + idx"
               >Afdeling</label
             >
 
@@ -391,6 +391,7 @@
                 v-model="vraag.contactverzoek.afdeling"
                 class="utrecht-select utrecht-select--html-select"
                 :id="'verzoek-afdeling' + idx"
+                required
               >
                 <option
                   v-for="afdeling in afdelingen.data"
@@ -561,7 +562,7 @@ const saveVraag = async (vraag: Vraag, gespreksId?: string) => {
       },
       primaireVraagWeergave: vraag.primaireVraag?.title,
       afwijkendOnderwerp: vraag.afwijkendOnderwerp || undefined,
-      afdeling: vraag.afdeling,
+      afdeling: vraag.contactverzoek.afdeling,
     });
 
     await koppelKlanten(vraag, contactverzoek.id);
