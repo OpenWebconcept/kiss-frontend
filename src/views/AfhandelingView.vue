@@ -382,15 +382,16 @@
               v-model="vraag.afwijkendOnderwerp"
             />
 
-            <label class="utrecht-form-label" :for="'verzoek-afdeling' + idx"
+            <label class="utrecht-form-label required" :for="'verzoek-afdeling' + idx"
               >Afdeling</label
             >
 
             <div v-if="afdelingen.success && afdelingen.data.length">
               <select
                 v-model="vraag.contactverzoek.afdeling"
-                class="utrecht-select utrecht-select--html-select required"
+                class="utrecht-select utrecht-select--html-select"
                 :id="'verzoek-afdeling' + idx"
+                required
               >
                 <option
                   v-for="afdeling in afdelingen.data"
