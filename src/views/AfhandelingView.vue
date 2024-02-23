@@ -389,7 +389,7 @@
             <div v-if="afdelingen.success && afdelingen.data.length">
               <select
                 v-model="vraag.contactverzoek.afdeling"
-                class="utrecht-select utrecht-select--html-select"
+                class="utrecht-select utrecht-select--html-select required"
                 :id="'verzoek-afdeling' + idx"
               >
                 <option
@@ -561,7 +561,7 @@ const saveVraag = async (vraag: Vraag, gespreksId?: string) => {
       },
       primaireVraagWeergave: vraag.primaireVraag?.title,
       afwijkendOnderwerp: vraag.afwijkendOnderwerp || undefined,
-      afdeling: vraag.afdeling,
+      afdeling: vraag.contactverzoek.afdeling,
     });
 
     await koppelKlanten(vraag, contactverzoek.id);
