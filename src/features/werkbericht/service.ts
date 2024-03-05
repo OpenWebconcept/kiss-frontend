@@ -42,9 +42,7 @@ function maxDate(dates: Date[]) {
  * @param jsonObject a json object
  * @param getBerichtTypeNameById a function to get the name of a berichttype from it's id
  */
-function parseWerkbericht(
-  jsonObject: any,
-): Werkbericht {
+function parseWerkbericht(jsonObject: any): Werkbericht {
   if (
     typeof jsonObject?.embedded?.title?.rendered !== "string" ||
     typeof jsonObject?.embedded?.acf?.publicationContent !== "string" ||
@@ -61,9 +59,7 @@ function parseWerkbericht(
 
   const skillIds = jsonObject?.embedded?.acf?.publicationSkill;
   const skillNames = Array.isArray(skillIds)
-    ? skillIds.map(
-      (skill) => skill.name || "onbekend"
-    )
+    ? skillIds.map((skill) => skill.name || "onbekend")
     : ["onbekend"];
 
   const dateCreated = parseDateStrWithTimezone(jsonObject.date);
@@ -183,15 +179,14 @@ export function useWerkberichten(
     params.push(["extend[]", "acf"]);
 
     if (typeId) {
-      const typeData = typesResult.data.entries.find((entry) => entry[0] === typeId)
-      if (!typeData) return ""
+      const typeData = typesResult.data.entries.find(
+        (entry) => entry[0] === typeId
+      );
+      if (!typeData) return "";
 
-      const typeName = typeData[1] === "nieuws" ? "nieuwsbericht" : typeData[1]
+      const typeName = typeData[1] === "nieuws" ? "nieuwsbericht" : typeData[1];
 
-      params.push([
-        "openpub-type",
-        _.upperFirst(typeName),
-      ]);
+      params.push(["openpub-type", _.upperFirst(typeName)]);
     }
 
     if (search) {
@@ -207,9 +202,10 @@ export function useWerkberichten(
 
     if (skillIds?.length) {
       skillIds.forEach((skillId) => {
-
-        const skillName = skillsResult.data.entries.find((entry) => entry[0] === skillId)
-        if (!skillName) return ""
+        const skillName = skillsResult.data.entries.find(
+          (entry) => entry[0] === skillId
+        );
+        if (!skillName) return "";
 
         params.push([
           "openpub-audience[]",
@@ -257,10 +253,7 @@ export function useWerkberichten(
         page: parameters?.value.page,
         results: sortedBerichten,
       },
-      (bericht: any) =>
-        parseWerkbericht(
-          bericht,
-        )
+      (bericht: any) => parseWerkbericht(bericht)
     );
   }
 

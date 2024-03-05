@@ -2,7 +2,6 @@
   <input
     v-bind="$attrs"
     :id="inputId"
-    :required="required"
     type="search"
     autocomplete="off"
     role="combobox"

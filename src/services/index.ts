@@ -44,7 +44,8 @@ export function createLookupList<K, V>(entries: [K, V][]): LookupList<K, V> {
 }
 
 export function throwIfNotOk(response: Response) {
-  if (!response.ok) throw new Error(response.status === 404 ? "404" : response.statusText);
+  if (!response.ok)
+    throw new Error(response.status === 404 ? "404" : response.statusText);
   return response as Response & { ok: true };
 }
 

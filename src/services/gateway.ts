@@ -1,5 +1,5 @@
 import type { Paginated } from "./pagination";
-import _ from "lodash"
+import _ from "lodash";
 
 export async function parsePagination<T>(
   json: unknown,
@@ -8,13 +8,8 @@ export async function parsePagination<T>(
   const { results, limit, total, page, pages } = json as {
     [key: string]: unknown;
   };
-  
-  if (
-    results === "" || _.isEmpty(results)
-  )
-    throw new Error(
-      "Empty Results"
-    );
+
+  if (results === "" || _.isEmpty(results)) throw new Error("Empty Results");
 
   if (
     !Array.isArray(results) ||
@@ -78,23 +73,18 @@ export async function parseWithoutPagination<T>(
     [key: string]: any;
   };
 
-  if (
-    _embedded === "" || _.isEmpty(_embedded)
-  )
-    throw new Error(
-      "Empty Results"
-    );
+  if (_embedded === "" || _.isEmpty(_embedded))
+    throw new Error("Empty Results");
 
-  if (
-    !Array.isArray(_embedded?.ingeschrevenpersonen)
-
-  )
+  if (!Array.isArray(_embedded?.ingeschrevenpersonen))
     throw new Error(
       "unexpected in gateway json. expected pagination: " + JSON.stringify(json)
     );
 
   // just in case the mapper is async, we wrap the result in a Promise
-  const promises = _embedded?.ingeschrevenpersonen.map((x: any) => Promise.resolve(map(x)));
+  const promises = _embedded?.ingeschrevenpersonen.map((x: any) =>
+    Promise.resolve(map(x))
+  );
 
   return {
     page: await Promise.all(promises),

@@ -7,7 +7,6 @@
       :result="result"
       :list-items="datalistItems"
       :exact-match="true"
-      :required="true"
     />
   </div>
 </template>
