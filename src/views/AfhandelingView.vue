@@ -389,7 +389,11 @@
               class="utrecht-form-label"
               :class="{ required: vraag.resultaat == 'Contactverzoek gemaakt' }"
               :for="'verzoek-afdeling' + idx"
-              >Contactverzoek versturen naar afdeling</label
+              >{{
+                vraag.resultaat == "Contactverzoek gemaakt"
+                  ? "Contactverzoek versturen naar afdeling"
+                  : "Afdeling"
+              }}</label
             >
 
             <div v-if="afdelingen.success && afdelingen.data.length">
@@ -405,7 +409,11 @@
                   :value="afdeling.id"
                   :required="true"
                 >
-                  {{ afdeling.email }} | {{ afdeling.name }}
+                  {{
+                    vraag.resultaat == "Contactverzoek gemaakt"
+                      ? `${afdeling.email} | ${afdeling.name}`
+                      : afdeling.name
+                  }}
                 </option>
               </select>
             </div>
