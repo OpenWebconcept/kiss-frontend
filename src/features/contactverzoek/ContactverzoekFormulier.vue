@@ -19,7 +19,7 @@
           :value="afdeling.id"
           :required="true"
         >
-          {{ afdeling.name }}
+          {{ afdeling.email }} | {{ afdeling.name }}
         </option>
       </select>
     </label>
