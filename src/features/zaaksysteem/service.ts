@@ -34,17 +34,15 @@ const getNamePerRoltype = (zaak: any, roletype: Roltype) => {
   return name || ONBEKEND;
 };
 
-
 const IsoAndIntConverter = (date: any) => {
   if (Number.isNaN(parseInt(date, 10))) {
-    return moment.duration(date).asDays()
+    return moment.duration(date).asDays();
   }
   if (!Number.isNaN(parseInt(date, 10))) {
-    return parseInt(date, 10)
+    return parseInt(date, 10);
   }
-  return 0
-}
-
+  return 0;
+};
 
 const mapZaakDetails = (zaak: any) => {
   const startdatum = zaak.startdatum ? new Date(zaak.startdatum) : undefined;

@@ -71,7 +71,7 @@ async function handleSubmit() {
 
     Cookies.set("userId", data.id);
     Cookies.set("jwt", data.jwtToken);
-    window.sessionStorage.setItem("jwt", data.jwtToken)
+    window.sessionStorage.setItem("jwt", data.jwtToken);
 
     router.push("/");
   }

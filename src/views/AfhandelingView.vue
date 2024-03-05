@@ -303,15 +303,14 @@
               <div class="contactverzoek-container">
                 <div>
                   <label
-                    class="utrecht-form-label required"
+                    class="utrecht-form-label"
                     :for="'verzoek-medewerker' + idx"
-                    >Contactverzoek versturen naar</label
+                    >Bevestiging mail versturen naar medewerker</label
                   >
                   <medewerker-search
                     v-model="vraag.contactverzoek.medewerker"
                     :id="'verzoek-medewerker' + idx"
                     class="utrecht-textbox utrecht-textbox--html-input medewerker-search"
-                    required
                   />
                 </div>
 
@@ -381,9 +380,16 @@
               :id="'afwijkendOnderwerp' + idx"
               v-model="vraag.afwijkendOnderwerp"
             />
-
-            <label class="utrecht-form-label required" :for="'verzoek-afdeling' + idx"
-              >Afdeling</label
+            <br v-if="vraag.resultaat == 'Contactverzoek gemaakt'" />
+            <span v-if="vraag.resultaat == 'Contactverzoek gemaakt'">
+              Let op! Er wordt een e-mail verstuurd naar de gekozen
+              afdeling</span
+            >
+            <label
+              class="utrecht-form-label"
+              :class="{ required: vraag.resultaat == 'Contactverzoek gemaakt' }"
+              :for="'verzoek-afdeling' + idx"
+              >Contactverzoek versturen naar afdeling</label
             >
 
             <div v-if="afdelingen.success && afdelingen.data.length">
@@ -391,14 +397,15 @@
                 v-model="vraag.contactverzoek.afdeling"
                 class="utrecht-select utrecht-select--html-select"
                 :id="'verzoek-afdeling' + idx"
-                required
+                :required="vraag.resultaat == 'Contactverzoek gemaakt'"
               >
                 <option
                   v-for="afdeling in afdelingen.data"
                   :key="idx + afdeling.id"
                   :value="afdeling.id"
+                  :required="true"
                 >
-                  {{ afdeling.name }}
+                  {{ afdeling.email }} | {{ afdeling.name }}
                 </option>
               </select>
             </div>

@@ -16,7 +16,8 @@ import { mutate } from "swrv";
 import type { Ref } from "vue";
 import type { Persoon } from "./types";
 
-const personenRootUrl = window.gatewayBaseUri + "/api/brp_proxy/ingeschrevenpersonen";
+const personenRootUrl =
+  window.gatewayBaseUri + "/api/brp_proxy/ingeschrevenpersonen";
 
 type QueryParam = [string, string][];
 
@@ -48,17 +49,11 @@ export function persoonQuery<K extends PersoonSearchField>(
 const queryDictionary: PersoonQueryParams = {
   bsn: (search) => [["burgerservicenummer", search]],
   geboortedatumAchternaam: (search) => [
-    [
-      "geboorte__datum",
-      formatIsoDate(search.geboortedatum),
-    ],
+    ["geboorte__datum", formatIsoDate(search.geboortedatum)],
     ["naam__geslachtsnaam", search.achternaam],
   ],
   postcodeHuisnummer: ({ postcode, huisnummer }) => [
-    [
-      "verblijfplaats__postcode",
-      `${postcode.numbers}${postcode.digits}`,
-    ],
+    ["verblijfplaats__postcode", `${postcode.numbers}${postcode.digits}`],
 
     ["verblijfplaats__huisnummer", huisnummer],
   ],

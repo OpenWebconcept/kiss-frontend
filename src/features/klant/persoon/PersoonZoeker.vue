@@ -56,12 +56,19 @@
         />
       </template>
       <application-message
-        v-if="klanten.error && klanten.error.message === `Empty Results` || klanten.error.message === `404`"
+        v-if="
+          (klanten.error && klanten.error.message === `Empty Results`) ||
+          klanten.error.message === `404`
+        "
         messageType="info"
         message="Geen resultaten gevonden"
       />
       <application-message
-        v-if="klanten.error && klanten.error.message !== `Empty Results` && klanten.error.message !== '404'"
+        v-if="
+          klanten.error &&
+          klanten.error.message !== `Empty Results` &&
+          klanten.error.message !== '404'
+        "
         messageType="error"
         message="Er is een fout opgetreden"
       />
@@ -82,12 +89,19 @@
         />
       </template>
       <application-message
-        v-if="personen.error && personen.error.message === `Empty Results` || personen.error.message === `404`"
+        v-if="
+          (personen.error && personen.error.message === `Empty Results`) ||
+          personen.error.message === `404`
+        "
         messageType="info"
         message="Geen resultaten gevonden"
       />
       <application-message
-        v-if="personen.error && personen.error.message !== `Empty Results` && personen.error.message !== `404`"
+        v-if="
+          personen.error &&
+          personen.error.message !== `Empty Results` &&
+          personen.error.message !== `404`
+        "
         messageType="error"
         message="Er is een fout opgetreden"
       />

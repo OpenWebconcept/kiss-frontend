@@ -2,8 +2,13 @@
   <section>
     <utrecht-heading :level="level">{{ header }}</utrecht-heading>
 
-    <paragraph v-if="berichten.state === 'error'">{{
-      berichten.error.message === 'Empty Results' || berichten.error.message === '404' ? getEmptyErrorMessage(berichten.error) : getErrorMessage(berichten.error)}}
+    <paragraph v-if="berichten.state === 'error'"
+      >{{
+        berichten.error.message === "Empty Results" ||
+        berichten.error.message === "404"
+          ? getEmptyErrorMessage(berichten.error)
+          : getErrorMessage(berichten.error)
+      }}
     </paragraph>
 
     <template v-else-if="berichten.state === 'success'">

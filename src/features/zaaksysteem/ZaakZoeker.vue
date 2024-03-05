@@ -16,12 +16,19 @@
 
     <template v-if="store.currentSearch">
       <application-message
-        v-if="zaken.error && zaken.error.message === `Empty Results` || zaken.error.message === `404`"
+        v-if="
+          (zaken.error && zaken.error.message === `Empty Results`) ||
+          zaken.error.message === `404`
+        "
         messageType="info"
         message="Geen resultaten gevonden"
       />
       <application-message
-        v-if="zaken.error && zaken.error.message !== `Empty Results` && zaken.error.message !== `404`"
+        v-if="
+          zaken.error &&
+          zaken.error.message !== `Empty Results` &&
+          zaken.error.message !== `404`
+        "
         messageType="error"
         message="Er is een probleem opgetreden."
       />
