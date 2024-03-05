@@ -1,9 +1,9 @@
 <template>
   <article class="details-block">
     <utrecht-heading :level="2"> Gegevens Handelsregister</utrecht-heading>
-    
+
     <div v-for="(bedrijf, index) in bedrijven.page">
-      <dl  >
+      <dl>
         <dt>Bedrijfsnaam</dt>
         <dd>{{ bedrijf.bedrijfsnaam }}</dd>
         <dt>KvK-nummer</dt>
@@ -34,7 +34,10 @@
         <dt>Plaats</dt>
         <dd>{{ bedrijf.woonplaats }}</dd>
       </dl>
-      <hr v-if="index + 1 !== bedrijven?.page?.length" class="utrecht-separator separator"/>
+      <hr
+        v-if="index + 1 !== bedrijven?.page?.length"
+        class="utrecht-separator separator"
+      />
     </div>
   </article>
 </template>
@@ -47,10 +50,8 @@ defineProps<{ bedrijven: Bedrijf }>();
 </script>
 
 <style scoped lang="scss">
-
 .separator {
   margin-block-start: 15px;
   margin-block-end: 15px;
 }
-   
 </style>

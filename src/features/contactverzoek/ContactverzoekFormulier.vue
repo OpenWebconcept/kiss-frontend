@@ -6,28 +6,29 @@
       class="utrecht-form-label"
       v-if="afdelingen.success && afdelingen.data.length"
     >
-      Afdeling
+      <span class="required"> Contactverzoek versturen naar afdeling </span>
       <select
         v-model="afdeling"
         name="afdeling"
         class="utrecht-select utrecht-select--html-select"
+        :required="true"
       >
         <option
           v-for="afdeling in afdelingen.data"
           :key="afdeling.id"
           :value="afdeling.id"
+          :required="true"
         >
-          {{ afdeling.name }}
+          {{ afdeling.email }} | {{ afdeling.name }}
         </option>
       </select>
     </label>
 
     <label class="utrecht-form-label">
-      <span class="required">Contactverzoek versturen naar</span>
+      <span>Bevestiging mail versturen naar medewerker</span>
       <medewerker-search
         class="utrecht-textbox utrecht-textbox--html-input"
         v-model="medewerker"
-        :defaultValue="medewerker"
       />
     </label>
 
@@ -55,6 +56,7 @@ import MedewerkerSearch from "@/features/search/MedewerkerSearch.vue";
 import { computed } from "@vue/reactivity";
 import { useAfdelingen } from "./service";
 import SimpleSpinner from "@/components/SimpleSpinner.vue";
+import { useCurrentUser } from "@/features/login/service.ts";
 
 const props = defineProps<{
   huidigeVraag: Vraag;
@@ -62,8 +64,21 @@ const props = defineProps<{
 
 const contactmomentStore = useContactmomentStore();
 
+const user = JSON.parse(JSON.stringify(useCurrentUser()));
+
+function medewerkerInit() {
+  if (window.sessionStorage.getItem("medewerkerInit" === "true")) return;
+  window.sessionStorage.setItem("medewerkerInit", "true");
+  contactmomentStore.updateContactverzoek({
+    ...props.huidigeVraag.contactverzoek,
+    medewerker: user.data.email,
+  });
+}
+
+const callMedewerkerInit = medewerkerInit();
+
 const medewerker = computed({
-  get: () => props.huidigeVraag.contactverzoek.medewerker,
+  get: () => props.huidigeVraag.contactverzoek.medewerker || user.data.email,
   set(medewerker) {
     if (!medewerker) return;
 

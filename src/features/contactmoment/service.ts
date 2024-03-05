@@ -79,17 +79,20 @@ export async function koppelKlant({
     _klantId = await getAnonymousUserId(); // we're setting the "klant" to an anonymous one which is readily available in the data set
   }
 
-  return fetchLoggedIn(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      klant: _klantId,
-      contactmoment: contactmomentId,
-      rol: "gesprekspartner",
-    }),
-  }).then(throwIfNotOk) as Promise<void>;
+  return fetchLoggedIn(
+    window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        klant: _klantId,
+        contactmoment: contactmomentId,
+        rol: "gesprekspartner",
+      }),
+    }
+  ).then(throwIfNotOk) as Promise<void>;
 }
 
 export function useContactverzoekenByKlantId(
@@ -97,7 +100,9 @@ export function useContactverzoekenByKlantId(
   page: Ref<number>
 ) {
   function getUrl() {
-    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
+    const url = new URL(
+      window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten"
+    );
     url.searchParams.set(
       "_order[embedded.contactmoment.registratiedatum]",
       "desc"
@@ -110,7 +115,6 @@ export function useContactverzoekenByKlantId(
     url.searchParams.set("_page", page.value.toString());
     url.searchParams.set("embedded.klant._self.id", id.value);
     url.searchParams.set("embedded.contactmoment.todo", "IS NOT NULL");
-    url.searchParams.set("klant", "IS NOT NULL");
     url.searchParams.set("contactmoment", "IS NOT NULL");
     return url.toString();
   }
@@ -127,7 +131,9 @@ export function useContactverzoekenByUserId(
   page: Ref<number>
 ) {
   function getUrl() {
-    const url = new URL(window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten");
+    const url = new URL(
+      window.gatewayBaseUri + "/api/kic/v1/klantcontactmomenten"
+    );
     url.searchParams.set(
       "_order[embedded.contactmoment.registratiedatum]",
       "desc"
@@ -140,7 +146,6 @@ export function useContactverzoekenByUserId(
     url.searchParams.set("_page", page.value.toString());
     url.searchParams.set("_self.owner.id", id.value);
     url.searchParams.set("embedded.contactmoment.todo", "IS NOT NULL");
-    url.searchParams.set("klant", "IS NOT NULL");
     url.searchParams.set("contactmoment", "IS NOT NULL");
     return url.toString();
   }

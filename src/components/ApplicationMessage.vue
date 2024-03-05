@@ -12,7 +12,12 @@ const props = defineProps({
   messageType: {
     type: String as PropType<"error" | "confirm" | "warning" | "info">,
     validator: (value) => {
-      return value == "error" || value == "confirm" || value == "warning" || value == "info";
+      return (
+        value == "error" ||
+        value == "confirm" ||
+        value == "warning" ||
+        value == "info"
+      );
     },
     default: "confirm",
   },
@@ -50,7 +55,7 @@ article {
 
 .info {
   background-color: var(--color-info);
-  color: black
+  color: black;
 }
 
 .fade {

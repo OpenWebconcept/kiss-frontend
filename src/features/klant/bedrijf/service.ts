@@ -124,8 +124,7 @@ export const useBedrijfByVestigingsnummer = (
     return url && url + "_single";
   };
 
-  const fetcher = (url: string) =>
-    searchBedrijvenInHandelsRegister(url);
+  const fetcher = (url: string) => searchBedrijvenInHandelsRegister(url);
 
   return ServiceResult.fromFetcher(getUrl, fetcher, {
     getUniqueId,

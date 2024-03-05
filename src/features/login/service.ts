@@ -7,10 +7,12 @@ const anonymousUser = Object.freeze({
   isLoggedIn: false,
 });
 
-async function fetchUser(url: string): Promise<User> {
+export async function fetchUser(url: string): Promise<User> {
   const response = await fetch(url, {
     headers: {
-      Authorization: `Bearer ${Cookies.get("jwt") ?? window.sessionStorage.getItem("jwt")}`,
+      Authorization: `Bearer ${
+        Cookies.get("jwt") ?? window.sessionStorage.getItem("jwt")
+      }`,
     },
   });
 
@@ -45,6 +47,6 @@ export const logOut = () =>
     } else {
       Cookies.remove("jwt");
       Cookies.remove("userId");
-      window.sessionStorage.removeItem("jwt")
+      window.sessionStorage.removeItem("jwt");
     }
   });
