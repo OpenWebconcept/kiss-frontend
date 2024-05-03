@@ -10,7 +10,7 @@
         <dd>{{ medewerkerRaw?.function }}</dd>
         <dt>Afdeling:</dt>
         <dd>{{ medewerkerRaw?.department }}</dd>
-        <dt>Omgschrijving:</dt>
+        <dt>Omschrijving:</dt>
         <dd>{{ medewerkerRaw?.description }}</dd>
       </dl>
     </section>
