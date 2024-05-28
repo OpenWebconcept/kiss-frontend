@@ -16,7 +16,7 @@
       <tbody>
         <tr v-for="zaak in zaken" :key="zaak.id" class="row-link">
           <th scope="row">{{ zaak.identificatie }}</th>
-          <td class="wrap">{{ zaak.aanvrager }}</td>
+          <td class="wrap">{{ zaak.embedded?.rollen ? zaak.embedded?.rollen[0]?.betrokkeneIdentificatie.inpBsn : zaak.aanvrager }}</td>
           <td class="wrap">{{ zaak.zaaktypeOmschrijving }}</td>
           <td class="wrap">{{ zaak.status }}</td>
           <td>{{ zaak.behandelaar }}</td>
