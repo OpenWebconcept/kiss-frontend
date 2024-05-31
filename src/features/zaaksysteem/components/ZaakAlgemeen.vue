@@ -10,7 +10,64 @@
         </li>
         <li>
           <span class="label">Aanvrager</span>
-          <span class="value">{{ zaak.aanvrager }}</span>
+          <span class="value" v-if="zaak.embedded?.rollen">
+            <span
+              v-if="
+                zaak.embedded?.rollen[0]?.betrokkeneType ===
+                'natuurlijk_persoon'
+              "
+            >
+              {{
+                zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.voornamen &&
+                zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.acternaam
+                  ? `${zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.voornamen} ${zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.voorvoegselActernaam} ${zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.acternaam}`
+                  : zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.inpBsn ||
+                    zaak.aanvrager
+              }}
+            </span>
+            <span
+              v-if="
+                zaak.embedded?.rollen[0]?.betrokkeneType ===
+                'niet_natuurlijk_persoon'
+              "
+            >
+              {{
+                zaak.embedded?.rollen[0]?.betrokkeneIdentificatie
+                  ?.statuaireNaam ||
+                zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.innNnpId ||
+                zaak.embedded?.rollen[0]?.betrokkeneIdentificatie
+                  ?.annIdentificatie ||
+                zaak.aanvrager
+              }}
+            </span>
+            <span
+              v-if="
+                zaak.embedded?.rollen[0]?.betrokkeneType ===
+                'organisatorische_eenheid'
+              "
+              >{{
+                zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.naam ||
+                zaak.embedded?.rollen[0]?.betrokkeneIdentificatie
+                  ?.identificatie ||
+                zaak.aanvrager
+              }}
+            </span>
+            <span
+              v-if="zaak.embedded?.rollen[0]?.betrokkeneType === 'vestiging'"
+              >{{
+                zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.handelsnaam
+                  .length >= 1
+                  ? zaak.embedded?.rollen[0]?.betrokkeneIdentificatie?.handelsnaam.map(
+                      (naam) => naam
+                    )
+                  : zaak.embedded?.rollen[0]?.betrokkeneIdentificatie
+                      ?.kvkNummer || zaak.aanvrager
+              }}
+            </span>
+          </span>
+          <span class="value" v-if="!zaak.embedded?.rollen"
+            >{{ zaak.aanvrager }}
+          </span>
         </li>
         <li>
           <span class="label">Status</span>
