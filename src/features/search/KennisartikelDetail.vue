@@ -22,7 +22,7 @@
       :id="id"
     >
       <utrecht-heading :level="headingLevel + 1">{{ label }}</utrecht-heading>
-      <div v-html="html"></div>
+      <div class="section-content" v-html="html"></div>
     </section>
   </article>
 
@@ -47,14 +47,15 @@ import type { Kennisartikel } from "./types";
 
 const knownSections = {
   specifiekeTekst: "Inleiding",
-  procedureBeschrijving: "Aanvraag",
+  procedureBeschrijving: "Meenemen",
   conditions: "Voorwaarden",
   bewijs: "Bewijs",
   kostenEnBetaalmethoden: "Kosten",
   uitersteTermijn: "Termijn",
   bezwaarEnBeroep: "Bezwaar",
   vereisten: "Vereisten",
-  notice: "Bijzonderheden",
+  notice: "Meer informatie",
+  faq: "Meer informatie",
   wtdBijGeenReactie: "Geen reactie",
   contact: "Contact",
   deskMemo: "KCC",
@@ -106,12 +107,47 @@ const processedSections = computed(() => {
   const sectionsWithActualText = allSections.filter(({ text }) => !!text);
 
   const sectionsWithProcessedHtml = sectionsWithActualText.map(
-    ({ label, text, key }) => ({
-      key: key,
-      label,
-      html: processHtml(text),
-    })
+    ({ label, text, key }) => {
+      if (key === "notice") {
+        if (sectionsWithActualText.find((item) => item.key === "faq")) {
+          return false;
+        }
+
+        return {
+          key: key,
+          label,
+          html: processHtml(text),
+        };
+      }
+
+      if (key === "faq") {
+        if (text.length === 0) {
+          return false;
+        }
+
+        const html = text.map((item) => {
+          return `<details><summary>${item.question}</summary><div class="content">${item.answer}</div></details>`;
+        });
+
+        return {
+          key: key,
+          label,
+          html: processHtml(`${html.join("")}`),
+        };
+      }
+
+      return {
+        key: key,
+        label,
+        html: processHtml(text),
+      };
+    }
   );
+
+  const index = sectionsWithProcessedHtml.indexOf(false);
+  if (index > -1) {
+    sectionsWithProcessedHtml.splice(index, 1);
+  }
 
   return sectionsWithProcessedHtml;
 });
@@ -204,6 +240,32 @@ article {
     :deep(p + p) {
       margin-block-start: var(--spacing-small);
     }
+  }
+}
+
+.section-content::v-deep {
+  details {
+    padding: 10px;
+    border-radius: 5px;
+  }
+
+  summary {
+    background-color: #415a77;
+    color: white;
+    padding: 10px;
+  }
+
+  summary:hover {
+    cursor: pointer;
+  }
+
+  summary::after {
+    display: none;
+  }
+
+  .content {
+    padding: 1.8rem;
+    border: 1px solid #415a77;
   }
 }
 
